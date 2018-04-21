@@ -13,9 +13,14 @@ const vinmonopolet = require('vinmonopolet')
   //console.log(response.products) // 3 products from Norway
 //})
 
-async function getAllCiders() {
 
-  let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue, vinmonopolet.Facet.Category.BEER]})
+async function getAllBeers() {
+
+  const facets = await vinmonopolet.getFacets();
+  const AllStores = facets.find(facet => facet.title == 'stores');
+  const store = AllStores.values.find(store => store.name == 'Trondheim, Bankkvartalet');
+
+  let {pagination, products} = await vinmonopolet.getProducts({facet: [store, vinmonopolet.Facet.Category.BEER]})
 
   while (pagination.hasNext) {
     const response = await pagination.next()
@@ -26,6 +31,6 @@ async function getAllCiders() {
   return products
 }
 
-getAllCiders().then(allProducts => {
+getAllBeers().then(allProducts => {
   console.log(allProducts)
 })
