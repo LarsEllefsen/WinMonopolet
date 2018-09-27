@@ -28,7 +28,7 @@ vinmonopolet.getFacets().then(facets => {
       var stockLevel = response.products[i].chosenStoreStock.stockLevel
       var price = response.products[i].price
       // console.log(type)
-      db.run('INSERT INTO beers VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+      db.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
     }
   }
   console.log(response.products[0])
