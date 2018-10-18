@@ -51,19 +51,24 @@ function getBeersByStore(store, exists){
 
     return vinmonopolet.getProducts({facet: [storeFacetValue, beer]})
   }).then(response => {
-    for(i=0; i<response.products.length; i++) {
-      if(response.products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
-        var code = response.products[i].code
-        var name = response.products[i].name
-        var type = response.products[i].mainSubCategory.name
-        var stockLevel = response.products[i].chosenStoreStock.stockLevel
-        var price = response.products[i].price
-        // console.log(type)
-        db.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+    var pagination = response.pagination
+      while(pagination.hasNext){
+        for(i=0; i<response.products.length; i++) {
+          if(response.products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
+            var code = response.products[i].code
+            var name = response.products[i].name
+            var type = response.products[i].mainSubCategory.name
+            var stockLevel = response.products[i].chosenStoreStock.stockLevel
+            var price = response.products[i].price
+            // console.log(type)
+            db.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+          }
+        }
+        pagination = pagination.next();
       }
-    }
-    console.log(response.products[0])
-    console.log(response.pagination)
+    console.log(typeof response)
+    console.log(pagination)
+
   })
   createOrUpdate(store,exists)
 }
@@ -85,5 +90,38 @@ function check_store(store){
   });
 }
 
-check_store('Trondheim, Bankkvartalet')
+async function test(store){
+  const tableName = formatName(store)
+  console.log("Querying store: "+tableName)
+  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, name TEXT NOT NULL, type TEXT NOT NULL, price REAL NOT NULL, score REAL NOT NULL, stockLevel INTEGER NOT NULL)');
+
+  const facets = await vinmonopolet.getFacets();
+  const storeFacet = facets.find(facet => facet.name === 'Butikker')
+  const storeFacetValue = storeFacet.values.find(val => val.name === store)
+  const beer = vinmonopolet.Facet.Category.BEER
+
+  let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
+
+  while(pagination.hasNext){
+    for(i=0; i<products.length; i++) {
+      if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
+        var code = products[i].code
+        var name = products[i].name
+        var type = products[i].mainSubCategory.name
+        var stockLevel = products[i].chosenStoreStock.stockLevel
+        var price = products[i].price
+        // console.log(type)
+        db.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+      }
+    }
+    const response = await pagination.next()
+    products = response.products
+    // products = products.concat(response.products)
+    pagination = response.pagination
+  }
+}
+
+// check_store('Trondheim, Bankkvartalet')
+// check_store('Trondheim, Valentinlyst')
+test('Trondheim, Bankkvartalet')
 //getBeersByStore('Trondheim, Bankkvartalet')
