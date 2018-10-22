@@ -1,7 +1,8 @@
 const vinmonopolet = require('vinmonopolet')
-const sqlite3 = require('sqlite3')
+var sqlite3 = require('sqlite3'),
+    TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 
-let db = new sqlite3.Database('inv.db', (err) => {
+let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
   if (err) {
     console.error(err.message);
   }
@@ -11,7 +12,7 @@ let db = new sqlite3.Database('inv.db', (err) => {
       console.log(err.message)
     }
   });
-});
+}));
 
 //Some store names contain commas, this function checks if that is the case, if so, formats it for sqlite3.
 function formatName(name) {
@@ -101,24 +102,36 @@ async function test(store){
   const beer = vinmonopolet.Facet.Category.BEER
 
   let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
-
-  while(pagination.hasNext){
-    for(i=0; i<products.length; i++) {
-      if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
-        var code = products[i].code
-        var name = products[i].name
-        var type = products[i].mainSubCategory.name
-        var stockLevel = products[i].chosenStoreStock.stockLevel
-        var price = products[i].price
-        // console.log(type)
-        db.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+  db.beginTransaction(function(err, transaction) {
+    async function insert(){
+      while(pagination.hasNext){
+        for(i=0; i<products.length; i++) {
+          if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
+            var code = products[i].code
+            var name = products[i].name
+            var type = products[i].mainSubCategory.name
+            var stockLevel = products[i].chosenStoreStock.stockLevel
+            var price = products[i].price
+            // console.log(type)
+            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+          }
+        }
+        const response = await pagination.next()
+        products = response.products
+        // products = products.concat(response.products)
+        pagination = response.pagination
       }
+      //END TRANSACTION
+      transaction.commit(function(err) {
+        if(err){
+          console.log("Transaction failed: " + err.message)
+        } else {
+          console.log("Transaction successful!")
+        }
+      });
     }
-    const response = await pagination.next()
-    products = response.products
-    // products = products.concat(response.products)
-    pagination = response.pagination
-  }
+    insert()
+  });
 }
 
 // check_store('Trondheim, Bankkvartalet')
