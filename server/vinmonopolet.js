@@ -37,43 +37,6 @@ function createOrUpdate(store, exists){
   }
 }
 
-//Gets all beers from the selected store and inserts into table.
-function getBeersByStore(store, exists){
-  const tableName = formatName(store)
-  console.log(tableName)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, name TEXT NOT NULL, type TEXT NOT NULL, price REAL NOT NULL, score REAL NOT NULL, stockLevel INTEGER NOT NULL)');
-
-  vinmonopolet.getFacets().then(facets => {
-    const storeFacet = facets.find(facet => facet.name === 'Butikker')
-    const storeFacetValue = storeFacet.values.find(val => val.name === store)
-
-    const productFacet = facets.find(facet => facet.name === 'productCategory')
-    const beer = vinmonopolet.Facet.Category.BEER
-
-    return vinmonopolet.getProducts({facet: [storeFacetValue, beer]})
-  }).then(response => {
-    var pagination = response.pagination
-      while(pagination.hasNext){
-        for(i=0; i<response.products.length; i++) {
-          if(response.products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
-            var code = response.products[i].code
-            var name = response.products[i].name
-            var type = response.products[i].mainSubCategory.name
-            var stockLevel = response.products[i].chosenStoreStock.stockLevel
-            var price = response.products[i].price
-            // console.log(type)
-            db.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
-          }
-        }
-        pagination = pagination.next();
-      }
-    console.log(typeof response)
-    console.log(pagination)
-
-  })
-  createOrUpdate(store,exists)
-}
-
 //Checks the store against the store table to see when it was last updated.
 //If it exists and is fresher than a set threshold (tbd), select from DB, else getBeersByStore
 function check_store(store){
@@ -81,9 +44,9 @@ function check_store(store){
     if(err){
       console.log(err.message)
     } else {
-      //If undefined, the store has yet to be created.
+      //If undefined, that store has not yet been added to the DB, thus we fetch all beers through the API
       if(row == undefined) {
-        getBeersByStore(store, false)
+        getFromVinmonopolet(store, false)
       } else {
         console.log(row)
       }
@@ -91,7 +54,14 @@ function check_store(store){
   });
 }
 
-async function test(store){
+/*
+Fetches all beers from the selected Vinmonopolet store (@param store) through the API
+and inserts them into the database.
+
+@Param exists tells the function if the table already exists. If true, update the last_updated on the corresponding store table,
+if false, tells the function to create the corresponding table.
+*/
+async function getFromVinmonopolet(store, exists){
   const tableName = formatName(store)
   console.log("Querying store: "+tableName)
   db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, name TEXT NOT NULL, type TEXT NOT NULL, price REAL NOT NULL, score REAL NOT NULL, stockLevel INTEGER NOT NULL)');
@@ -102,8 +72,14 @@ async function test(store){
   const beer = vinmonopolet.Facet.Category.BEER
 
   let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
+  /*
+  TRANSACTION BEGINS HERE
+  Due to the way transactions work with async, we need to do all the async operations (await) inside a new async function after
+  starting the transaction function, thus the need for a nested function. A bit clunky, but it gets the job done.
+*/
   db.beginTransaction(function(err, transaction) {
     async function insert(){
+      var t0 = Date.now(); //used for time measurement
       while(pagination.hasNext){
         for(i=0; i<products.length; i++) {
           if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
@@ -126,15 +102,17 @@ async function test(store){
         if(err){
           console.log("Transaction failed: " + err.message)
         } else {
-          console.log("Transaction successful!")
+          var t1 = Date.now();
+          console.log("Transaction successful! Took " + (t1 - t0) + " milliseconds.")
         }
       });
     }
-    insert()
+    insert();
   });
+  createOrUpdate(store,exists)
 }
 
 // check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
-test('Trondheim, Bankkvartalet')
+check_store('Malvik')
 //getBeersByStore('Trondheim, Bankkvartalet')
