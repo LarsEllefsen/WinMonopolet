@@ -1,4 +1,5 @@
-const vinmonopolet = require('vinmonopolet')
+const vinmonopolet = require('vinmonopolet');
+const scraper = require('./scraper.js');
 var sqlite3 = require('sqlite3'),
     TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 
@@ -114,5 +115,7 @@ async function getFromVinmonopolet(store, exists){
 
 // check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
-check_store('Malvik')
-//getBeersByStore('Trondheim, Bankkvartalet')
+// check_store('Malvik')
+scraper.getRatingByName("Great Divide Yeti Imperial Stout").then(function(value) {
+  console.log(value)
+});
