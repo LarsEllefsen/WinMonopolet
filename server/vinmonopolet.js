@@ -56,7 +56,8 @@ function check_store(store){
       if(row == undefined) {
         getFromVinmonopolet(store, false)
       } else {
-        console.log(row)
+        getFromVinmonopolet(store, false)
+        // console.log(row)
       }
     }
   });
@@ -72,7 +73,7 @@ if false, tells the function to create the corresponding table.
 async function getFromVinmonopolet(store, exists){
   const tableName = formatName(store)
   console.log("Querying store: "+tableName)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, stockLevel INTEGER NOT NULL)');
+  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT, stockLevel INTEGER NOT NULL, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
 
   const facets = await vinmonopolet.getFacets();
   const storeFacet = facets.find(facet => facet.name === 'Butikker')
@@ -97,7 +98,8 @@ async function getFromVinmonopolet(store, exists){
             var stockLevel = products[i].chosenStoreStock.stockLevel
             var price = products[i].price
             // console.log(type)
-            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?,?,?,?)', [code,name,type,price,69.0,stockLevel])
+            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",00000,69.0,11111,70.0,69.5,price,type])
+            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?)', [code,stockLevel])
           }
         }
         const response = await pagination.next()
@@ -120,9 +122,9 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
-// check_store('Trondheim, Bankkvartalet')
+check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
 // check_store('Malvik')
-scraper.getRatingByName("Omnipollo Buxton Original Double Vanilla Ice Cream IIPA").then(function(value) {
-  console.log(value)
-});
+// scraper.getRatingByName("Omnipollo Buxton Original Double Vanilla Ice Cream IIPA").then(function(value) {
+//   console.log(value)
+// });
