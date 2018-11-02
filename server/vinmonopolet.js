@@ -8,7 +8,14 @@ let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
     console.error(err.message);
   }
   console.log('Connected to the inventory database.');
+  //Creates a table containing a list of all the stores
   db.run('CREATE TABLE IF NOT EXISTS stores (store_id INTEGER PRIMARY KEY, name TEXT NOT NULL, last_updated TEXT NOT NULL)', function(err) {
+    if (err){
+      console.log(err.message)
+    }
+  });
+  //Creates a table containing all the beers
+  db.run('CREATE TABLE IF NOT EXISTS beers (vmp_id INTEGER PRIMARY KEY, vmp_name TEXT NOT NULL, untappd_name TEXT, untappd_id INTEGER, untapped_score REAL, ratebeer_id INT, ratebeer_score REAL, total_score REAL, price INT, type TEXT)', function(err) {
     if (err){
       console.log(err.message)
     }
@@ -65,7 +72,7 @@ if false, tells the function to create the corresponding table.
 async function getFromVinmonopolet(store, exists){
   const tableName = formatName(store)
   console.log("Querying store: "+tableName)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, name TEXT NOT NULL, type TEXT NOT NULL, price REAL NOT NULL, score REAL NOT NULL, stockLevel INTEGER NOT NULL)');
+  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (id INTEGER PRIMARY KEY ON CONFLICT IGNORE, stockLevel INTEGER NOT NULL)');
 
   const facets = await vinmonopolet.getFacets();
   const storeFacet = facets.find(facet => facet.name === 'Butikker')
@@ -116,6 +123,6 @@ async function getFromVinmonopolet(store, exists){
 // check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
 // check_store('Malvik')
-scraper.getRatingByName("Great Divide Yeti Imperial Stout").then(function(value) {
+scraper.getRatingByName("Omnipollo Buxton Original Double Vanilla Ice Cream IIPA").then(function(value) {
   console.log(value)
 });
