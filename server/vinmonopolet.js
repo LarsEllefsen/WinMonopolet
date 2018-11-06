@@ -15,7 +15,7 @@ let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
     }
   });
   //Creates a table containing all the beers
-  db.run('CREATE TABLE IF NOT EXISTS beers (vmp_id INTEGER PRIMARY KEY, vmp_name TEXT NOT NULL, untappd_name TEXT, untappd_id INTEGER, untapped_score REAL, ratebeer_id INT, ratebeer_score REAL, total_score REAL, price INT, type TEXT)', function(err) {
+  db.run('CREATE TABLE IF NOT EXISTS beers (vmp_id INTEGER PRIMARY KEY, vmp_name TEXT NOT NULL, untappd_name TEXT, untappd_id INTEGER, untapped_score REAL, ratebeer_id INT, ratebeer_score REAL, total_score REAL, price INT, type TEXT, abv REAL)', function(err) {
     if (err){
       console.log(err.message)
     }
@@ -97,8 +97,10 @@ async function getFromVinmonopolet(store, exists){
             var type = products[i].mainSubCategory.name
             var stockLevel = products[i].chosenStoreStock.stockLevel
             var price = products[i].price
+            var abv = products[i].abv
+            console.log(products[i])
             // console.log(type)
-            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",00000,69.0,11111,70.0,69.5,price,type])
+            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",00000,69.0,11111,70.0,69.5,price,type,abv])
             transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?)', [code,stockLevel])
           }
         }
