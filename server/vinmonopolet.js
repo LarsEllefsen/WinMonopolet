@@ -7,6 +7,7 @@ let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
   if (err) {
     console.error(err.message);
   }
+  db.run("PRAGMA foreign_keys = ON")
   console.log('Connected to the inventory database.');
   //Creates a table containing a list of all the stores
   db.run('CREATE TABLE IF NOT EXISTS stores (store_id INTEGER PRIMARY KEY, name TEXT NOT NULL, last_updated TEXT NOT NULL)', function(err) {
@@ -64,6 +65,43 @@ function check_store(store){
 }
 
 /*
+Fetches ALL beers from vinmonopolet and writes them to the Beer table.
+Takes a long time, so only really used for the initial DB fill or making sure the DB is up to date.
+*/
+async function getAllBeers(){
+  let {pagination, products} = await vinmonopolet.getProducts({facet: vinmonopolet.Facet.Category.BEER})
+
+  db.beginTransaction(function(err, transaction) {
+    async function insert(){
+      var t0 = Date.now(); //used for time measurement
+      while(pagination.hasNext){
+        for(i=0; i<products.length; i++) {
+            var code = products[i].code
+            var name = products[i].name
+            var type = products[i].mainSubCategory.name
+            var price = products[i].price
+            var abv = products[i].abv
+            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",null,null,null,null,null,price,type,abv])
+        }
+        const response = await pagination.next()
+        products = response.products
+        pagination = response.pagination
+      }
+      //END TRANSACTION
+      transaction.commit(function(err) {
+        if(err){
+          console.log("Transaction failed: " + err.message)
+        } else {
+          var t1 = Date.now();
+          console.log("Transaction successful! Took " + (t1 - t0) + " milliseconds.")
+        }
+      });
+    }
+    insert();
+  });
+}
+
+/*
 Fetches all beers from the selected Vinmonopolet store (@param store) through the API
 and inserts them into the database.
 
@@ -73,7 +111,7 @@ if false, tells the function to create the corresponding table.
 async function getFromVinmonopolet(store, exists){
   const tableName = formatName(store)
   console.log("Querying store: "+tableName)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT, stockLevel INTEGER NOT NULL, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
+  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT UNIQUE, stockLevel INTEGER NOT NULL, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
 
   const facets = await vinmonopolet.getFacets();
   const storeFacet = facets.find(facet => facet.name === 'Butikker')
@@ -98,7 +136,7 @@ async function getFromVinmonopolet(store, exists){
             var stockLevel = products[i].chosenStoreStock.stockLevel
             var price = products[i].price
             var abv = products[i].abv
-            console.log(products[i])
+            // console.log(products[i])
             // console.log(type)
             transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",00000,69.0,11111,70.0,69.5,price,type,abv])
             transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?)', [code,stockLevel])
@@ -124,7 +162,8 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
-check_store('Trondheim, Bankkvartalet')
+getAllBeers();
+// check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
 // check_store('Malvik')
 // scraper.getRatingByName("Omnipollo Buxton Original Double Vanilla Ice Cream IIPA").then(function(value) {
