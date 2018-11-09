@@ -24,6 +24,7 @@
     "cheerio": "^1.0.0-rc.2",
     "compression": "^1.6.2",
     "express": "^4.14.0",
+    "node-untappd": "^0.4.1",
     "object-assign": "^4.1.1",
     "promise": "^7.1.1",
     "prop-types": "^15.5.10",
