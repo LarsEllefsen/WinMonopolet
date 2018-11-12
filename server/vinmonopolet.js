@@ -164,6 +164,20 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
+function getIds(){
+  db.all("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''", function(err, rows) {
+    console.log(rows[0].vmp_name)
+    var bid = api.getBID(rows[0].vmp_name)
+    console.log(bid)
+    db.run('UPDATE beers SET untappd_id = ? WHERE vmp_id = ?', [bid,rows[0].vmp_id])
+    // rows.forEach(function (row) {
+    //   console.log(row.vmp_name)
+    // });
+  });
+}
+
+
+getIds()
 // api.test("Nøgne Ø Porter");
 // getAllBeers();
 // check_store('Trondheim, Bankkvartalet')

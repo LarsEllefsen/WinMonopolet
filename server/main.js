@@ -13,13 +13,13 @@ var https = require('https');
 const app = express()
 app.use(compress())
 
-var options = {
-    key: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.key'),
-    cert: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.crt'),
-    passphrase: config.cert_key,
-    requestCert: false,
-    rejectUnauthorized: false
-};
+// var options = {
+//     key: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.key'),
+//     cert: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.crt'),
+//     passphrase: config.cert_key,
+//     requestCert: false,
+//     rejectUnauthorized: false
+// };
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
