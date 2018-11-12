@@ -1,15 +1,17 @@
 //Imports
-var UntappdClient = require("node-untappd");
 var config = require("./config.js")
+var request = require('request');
+const https = require('https');
 
-//Set up credentials
-var clientId = config.unt_clientId;
-var clientSecret = config.unt_clientSecret;
 
-// Set to true if you want to see all sort of nasty output on stdout.
-var debug = false;
+var propertiesObject = { field1:'Nøgne Ø Porter'};
 
-//Create and set up the Untappd client
-var untappd = new UntappdClient(debug);
-untappd.setClientId(clientID);
-untappd.setClientSecret(clientSecret)
+var url = 'https://api.untappd.com/v4/search/beer?client_id='+config.unt_clientId+'&client_secret='+config.unt_clientSecret+'&q=pliny'
+
+request(url, function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+    console.log(body);
+  } else {
+    console.log(response.statusCode)
+  }
+});

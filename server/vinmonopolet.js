@@ -1,5 +1,7 @@
 const vinmonopolet = require('vinmonopolet');
 const scraper = require('./scraper.js');
+const config = require('./config.js')
+const api = require('./api.js')
 var sqlite3 = require('sqlite3'),
     TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 
@@ -162,7 +164,8 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
-getAllBeers();
+// api.test("Nøgne Ø Porter");
+// getAllBeers();
 // check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
 // check_store('Malvik')

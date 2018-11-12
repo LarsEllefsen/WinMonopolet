@@ -1,3 +1,5 @@
 node_modules
 config.js
 server\config.js
+server\ssl
+server\server.js

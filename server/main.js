@@ -6,9 +6,20 @@ const webpackConfig = require('../build/webpack.config')
 const project = require('../project.config')
 const compress = require('compression')
 const vm = require('./vinmonopolet.js')
+const config = require('./config.js')
+var fs = require('fs-extra');
+var https = require('https');
 
 const app = express()
 app.use(compress())
+
+var options = {
+    key: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.key'),
+    cert: fs.readFileSync('C:/Github/WinMonopolet/server/ssl/server.crt'),
+    passphrase: config.cert_key,
+    requestCert: false,
+    rejectUnauthorized: false
+};
 
 // ------------------------------------
 // Apply Webpack HMR Middleware
