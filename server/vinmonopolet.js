@@ -166,10 +166,23 @@ async function getFromVinmonopolet(store, exists){
 
 function getIds(){
   db.all("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''", function(err, rows) {
-    console.log(rows[0].vmp_name)
-    var bid = api.getBID(rows[0].vmp_name)
-    console.log(bid)
-    db.run('UPDATE beers SET untappd_id = ? WHERE vmp_id = ?', [bid,rows[0].vmp_id])
+    api.getBID(rows).then(function(updated_rows) {
+      console.log("hei");
+      var new_rows = updated_rows;
+      db.beginTransaction(function(err, transaction) {
+        for(i=0; i<new_rows.length; i++){
+          transaction.run('UPDATE beers SET untappd_id = ?, abv = ? WHERE vmp_id = ?',[new_rows[i].untappd_id, new_rows[i].abv, new_rows[i].vmp_id]);
+        }
+        transaction.commit(function(err) {
+          if(err){
+            console.log("Transaction failed: " + err.message)
+          } else {
+            console.log("Transaction successful!")
+          }
+        });
+      });
+    });
+    // db.run('UPDATE beers SET untappd_id = ? WHERE vmp_id = ?',[rows[0].untappd_id,rows[0].vmp_id]);
     // rows.forEach(function (row) {
     //   console.log(row.vmp_name)
     // });
