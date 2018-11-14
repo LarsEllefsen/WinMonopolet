@@ -37,6 +37,7 @@
     "redux-thunk": "^2.2.0",
     "sqlite3": "^4.0.2",
     "sqlite3-transactions": "^0.0.5",
+    "untappd-js": "^1.0.3",
     "vinmonopolet": "^5.1.0",
     "whatwg-fetch": "^2.0.3"
   },

@@ -1,10 +1,24 @@
 //Imports
 var config = require("./config.js")
-var request = require('request');
+var request = require('request-promise-native');
 const https = require('https');
 
 const clientID = config.unt_clientId;
 const clientSecret = config.unt_clientSecret;
+
+var options = {
+    uri: 'https://api.untappd.com/v4/search/beer',
+    qs: {
+        client_id: clientID, // -> uri + '?access_token=xxxxx%20xxxxx'
+        client_secret: clientSecret,
+        q: "Nøgne Ø Imperial Stout"
+    },
+    headers: {
+        'User-Agent': 'Request-Promise'
+    },
+    json: true, // Automatically parses the JSON string in the response
+    resolveWithFullResponse: true
+};
 
 // var url = 'https://api.untappd.com/v4/search/beer?client_id='+config.unt_clientId+'&client_secret='+config.unt_clientSecret+'&q=Mack Mikrobryggeri Error 404 Dubbel/Saison'
 //
@@ -47,34 +61,18 @@ Since the naming convetion between vinmonopolet and Untappd is different, it is 
   //   });
   // }
 
-  getBID : async function(rows){
-    for (i = 0; i < rows.length; i++) {
-      console.log("Den kjører!")
-      var url = 'https://api.untappd.com/v4/search/beer?client_id='+clientID+'&client_secret='+clientSecret+'&q='+rows[i].vmp_namertr
-      request(url, function (error, response, body) {
-        console.log(response.statusCode)
-        var res = JSON.parse(body);
-        var count =  res.response.beers.count;
-        var remaining = parseInt(response.headers['x-ratelimit-remaining']);
-        if (!error && response.statusCode == 200 && remaining <1 ) {
-          console.log("Number of calls remaining: " + remaining)
+  getBID : function(row){
+    options.qs.q = row.vmp_name;
+    request(options).then(function(res) {
+      var remaining = res.headers['x-ratelimit-remaining'];
+      var count = res.body.response.beers.count;
+      // console.log(res.body.response.beers.items[0].beer.bid);
+      if(res.statusCode == 200 && remaining >1){
           if(count != 0){
-            rows[i].untappd_id = res.response.beers.items[0].beer.bid;
-            rows[i].abv = res.response.beers.items[0].beer.beer_abv;
-          } else {
-            //Didnt get any search results, set to 0, thus needs manual setting in the DB.
-            rows[i].untappd_id = 0;
-            rows[i].abv = 0.0;
+            row.vmp_id
           }
-        } else {
-        //----Returns a promise----
-          return new Promise(resolve => {
-              setTimeout(() => {
-                resolve(rows);
-              }, 1000);
-            });
-      });
-    }
+      }
+    });
   }
 
 }

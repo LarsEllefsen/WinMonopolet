@@ -2,6 +2,7 @@ const vinmonopolet = require('vinmonopolet');
 const scraper = require('./scraper.js');
 const config = require('./config.js')
 const api = require('./api.js')
+var Promise = require('promise');
 var sqlite3 = require('sqlite3'),
     TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 
@@ -164,33 +165,13 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
-function getIds(){
-  db.all("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''", function(err, rows) {
-    api.getBID(rows).then(function(updated_rows) {
-      console.log("hei");
-      var new_rows = updated_rows;
-      db.beginTransaction(function(err, transaction) {
-        for(i=0; i<new_rows.length; i++){
-          transaction.run('UPDATE beers SET untappd_id = ?, abv = ? WHERE vmp_id = ?',[new_rows[i].untappd_id, new_rows[i].abv, new_rows[i].vmp_id]);
-        }
-        transaction.commit(function(err) {
-          if(err){
-            console.log("Transaction failed: " + err.message)
-          } else {
-            console.log("Transaction successful!")
-          }
-        });
-      });
-    });
-    // db.run('UPDATE beers SET untappd_id = ? WHERE vmp_id = ?',[rows[0].untappd_id,rows[0].vmp_id]);
-    // rows.forEach(function (row) {
-    //   console.log(row.vmp_name)
-    // });
-  });
+async function getIds(){
+
+
 }
 
-
-getIds()
+api.getBID("hei")
+// getIds()
 // api.test("Nøgne Ø Porter");
 // getAllBeers();
 // check_store('Trondheim, Bankkvartalet')
