@@ -239,9 +239,9 @@ function getIdsTest(){
 }
 
 
-// getIdsTest();
+getIdsTest();
 // api.getBID("hei")
-updateStore("Trondheim, Bankkvartalet");
+// updateStore("Trondheim, Bankkvartalet");
 // api.test("Nøgne Ø Porter");
 // getAllBeers();
 // check_store('Trondheim, Bankkvartalet')

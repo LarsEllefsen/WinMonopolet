@@ -37,7 +37,7 @@ function getBID(row){
                 row.abv = res.body.response.beers.items[0].beer.beer_abv;
                 resolve(row);
               } else {
-                row.vmp_id = 0;
+                row.untappd_id = 0;
                 row.abv = 0.0;
                 resolve(row);
               }
