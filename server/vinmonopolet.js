@@ -6,6 +6,7 @@ var Promise = require('promise');
 var sqlite3 = require('sqlite3'),
     TransactionDatabase = require('sqlite3-transactions').TransactionDatabase;
 
+
 let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
   if (err) {
     console.error(err.message);
@@ -105,6 +106,46 @@ async function getAllBeers(){
 }
 
 /*
+Checks the stock of the store in the DB against a current stock, and updates accordingly.
+This is to provide correct stock information, add new beers and remove sold out beers.
+*/
+async function updateStore(store){
+  const tableName = formatName(store)
+  const facets = await vinmonopolet.getFacets();
+  const storeFacet = facets.find(facet => facet.name === 'Butikker')
+  const storeFacetValue = storeFacet.values.find(val => val.name === store)
+  const beer = vinmonopolet.Facet.Category.BEER
+
+  let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
+
+  while (pagination.hasNext) {
+    const response = await pagination.next()
+    products = products.concat(response.products)
+    pagination = response.pagination
+  }
+
+  var filtered_new = [];
+  var filtered_old = [];
+  for(i=0; i<products.length;i++){
+    filtered_new.push(parseInt(products[i].code));
+  }
+
+  db.getAsync('SELECT vmp_id from '+tableName).then((rows)=> {
+    for(i=0; i<rows.length;i++){
+      filtered_old.push(parseInt(rows[i].vmp_id));
+    }
+    var outdated_beers = filtered_old.filter(e => !filtered_new.includes(e))
+    console.log(outdated_beers)
+  });
+
+  // Array.prototype.diff = arr1.filter(x => arr2.includes(x));
+
+
+  // console.log(outdated_beers)
+
+}
+
+/*
 Fetches all beers from the selected Vinmonopolet store (@param store) through the API
 and inserts them into the database.
 
@@ -197,10 +238,10 @@ function getIdsTest(){
   });
 }
 
-getIdsTest();
+
 // getIdsTest();
 // api.getBID("hei")
-// getIds()
+updateStore("Trondheim, Bankkvartalet");
 // api.test("Nøgne Ø Porter");
 // getAllBeers();
 // check_store('Trondheim, Bankkvartalet')
