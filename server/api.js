@@ -61,18 +61,36 @@ Since the naming convetion between vinmonopolet and Untappd is different, it is 
   //   });
   // }
 
+//rewrite to allow ALL rows, and do the iteration in here instead
   getBID : function(row){
-    options.qs.q = row.vmp_name;
-    request(options).then(function(res) {
-      var remaining = res.headers['x-ratelimit-remaining'];
-      var count = res.body.response.beers.count;
-      // console.log(res.body.response.beers.items[0].beer.bid);
-      if(res.statusCode == 200 && remaining >1){
-          if(count != 0){
-            row.vmp_id
-          }
-      }
-    });
+    return new Promise(function (resolve, reject){
+      setTimeout(function() {
+      options.qs.q = row.vmp_name;
+      request(options).then(function(res) {
+        var remaining = res.headers['x-ratelimit-remaining'];
+        var count = res.body.response.beers.count;
+        // console.log(res.body.response.beers.items[0].beer.bid);
+        if(res.statusCode == 200 && remaining >50){
+          console.log(remaining);
+            if(count != 0){
+              row.untappd_id = res.body.response.beers.items[0].beer.bid;
+              row.abv = res.body.response.beers.items[0].beer.beer_abv;
+              resolve(row);
+            } else {
+              row.vmp_id = 0;
+              row.abv = 0;
+              resolve(row);
+            }
+        } else {
+          if(remaining <=50){
+            reject("API limit is reached");
+        } else {
+            reject("Something went wrong. Returned statuscode is: " + res.statusCode);
+        }
+        }
+      });
+    },1000);//timeout
+  });//Klamma her
   }
 
 }

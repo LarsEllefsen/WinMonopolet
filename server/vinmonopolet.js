@@ -165,12 +165,39 @@ async function getFromVinmonopolet(store, exists){
   createOrUpdate(store,exists)
 }
 
-async function getIds(){
-
-
+db.getAsync = function(sql) {
+  var that = this;
+  return new Promise(function(resolve, reject){
+    that.all(sql, function (err, row) {
+      if(err){
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
 }
 
-api.getBID("hei")
+function getIdsTest(){
+  db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then((rows) =>{
+    db.beginTransaction(function(err, transaction) {
+      api.getBID(rows[0]).then((new_row) =>{
+        transaction.run('UPDATE beers SET untappd_id = ?, abv = ? WHERE vmp_id = ?',[new_row.untappd_id, new_row.abv, new_row.vmp_id]);
+        transaction.commit(function(err) {
+                    if(err){
+                      console.log("Transaction failed: " + err.message)
+                    } else {
+                      var t1 = Date.now();
+                      console.log("Transaction successful!")
+                    }
+                  });
+      });
+    });
+  });
+}
+
+getIds();
+// api.getBID("hei")
 // getIds()
 // api.test("Nøgne Ø Porter");
 // getAllBeers();
