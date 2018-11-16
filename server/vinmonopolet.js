@@ -179,24 +179,26 @@ db.getAsync = function(sql) {
 }
 
 function getIdsTest(){
-  db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then((rows) =>{
+  db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then(async function (rows) {
+    var updated_rows = await api.getBIDs(rows);
     db.beginTransaction(function(err, transaction) {
-      api.getBID(rows[0]).then((new_row) =>{
-        transaction.run('UPDATE beers SET untappd_id = ?, abv = ? WHERE vmp_id = ?',[new_row.untappd_id, new_row.abv, new_row.vmp_id]);
-        transaction.commit(function(err) {
-                    if(err){
-                      console.log("Transaction failed: " + err.message)
-                    } else {
-                      var t1 = Date.now();
-                      console.log("Transaction successful!")
-                    }
-                  });
+      for(i=0; i<updated_rows.length; i++){
+        transaction.run('UPDATE beers SET untappd_id = ?, abv = ? WHERE vmp_id = ?',[updated_rows[i].untappd_id, updated_rows[i].abv, updated_rows[i].vmp_id]);
+      }
+      transaction.commit(function(err) {
+        if(err){
+          console.log("Transaction failed: " + err.message)
+        } else {
+          var t1 = Date.now();
+          console.log("Transaction successful!")
+        }
       });
     });
   });
 }
 
-getIds();
+getIdsTest();
+// getIdsTest();
 // api.getBID("hei")
 // getIds()
 // api.test("Nøgne Ø Porter");
