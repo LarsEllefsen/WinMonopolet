@@ -30,7 +30,7 @@ function getBID(row){
           var remaining = res.headers['x-ratelimit-remaining'];
           var count = res.body.response.beers.count;
           // console.log(res.body.response.beers.items[0].beer.bid);
-          if(res.statusCode == 200 && remaining >1){
+          if(res.statusCode == 200 && remaining >=1){
             console.log(remaining);
               if(count != 0){
                 row.untappd_id = res.body.response.beers.items[0].beer.bid;
@@ -42,8 +42,15 @@ function getBID(row){
                 resolve(row);
               }
           } else {
-            reject("Api limit reached, or error occured");
+            if(res.headers['status'] == 429){
+              reject("Api limit reached for this hour");
+            } else {
+              reject("The API encountered an error, statusCode " + res.statusCode)
+            }
+
           }
+    }).catch(function (err) {
+      reject("API limit reached for this hour");
     });
 
   });//Klamma her

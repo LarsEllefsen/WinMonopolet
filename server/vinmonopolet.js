@@ -13,12 +13,6 @@ let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
   }
   db.run("PRAGMA foreign_keys = ON")
   console.log('Connected to the inventory database.');
-  //Creates a table containing a list of all the stores
-  db.run('CREATE TABLE IF NOT EXISTS stores (store_id INTEGER PRIMARY KEY, name TEXT NOT NULL, last_updated TEXT NOT NULL)', function(err) {
-    if (err){
-      console.log(err.message)
-    }
-  });
   //Creates a table containing all the beers
   db.run('CREATE TABLE IF NOT EXISTS beers (vmp_id INTEGER PRIMARY KEY, vmp_name TEXT NOT NULL, untappd_name TEXT, untappd_id INTEGER, untapped_score REAL, ratebeer_id INT, ratebeer_score REAL, total_score REAL, price INT, type TEXT, abv REAL)', function(err) {
     if (err){
@@ -36,37 +30,6 @@ function formatName(name) {
   }
 }
 
-
-function createOrUpdate(store, exists){
-  var date = new Date();
-  if(exists){
-    db.run('UPDATE stores SET last_updated = ? WHERE name = ?', [date,store])
-  } else {
-    db.run('INSERT INTO stores VALUES (?,?,?)', [null,store,date], function(err) {
-      if (err){
-        console.log(err.message)
-      }
-    })
-  }
-}
-
-//Checks the store against the store table to see when it was last updated.
-//If it exists and is fresher than a set threshold (tbd), select from DB, else getBeersByStore
-function check_store(store){
-  db.get('SELECT * FROM stores WHERE name=?', [store], (err, row) =>{
-    if(err){
-      console.log(err.message)
-    } else {
-      //If undefined, that store has not yet been added to the DB, thus we fetch all beers through the API
-      if(row == undefined) {
-        getFromVinmonopolet(store, false)
-      } else {
-        getFromVinmonopolet(store, false)
-        // console.log(row)
-      }
-    }
-  });
-}
 
 /*
 Fetches ALL beers from vinmonopolet and writes them to the Beer table.
@@ -124,24 +87,31 @@ async function updateStore(store){
     pagination = response.pagination
   }
 
-  var filtered_new = [];
-  var filtered_old = [];
-  for(i=0; i<products.length;i++){
-    filtered_new.push(parseInt(products[i].code));
-  }
-
-  db.getAsync('SELECT vmp_id from '+tableName).then((rows)=> {
-    for(i=0; i<rows.length;i++){
-      filtered_old.push(parseInt(rows[i].vmp_id));
+  db.beginTransaction(function(err, transaction) {
+    var date = new Date().toISOString();
+    for(i=0; i<products.length; i++){
+      transaction.run("UPDATE "+tableName+" SET stockLevel = ?, last_updated = ? WHERE vmp_id = ?",[products[i].chosenStoreStock.stockLevel, date, products[i].code]);
     }
-    var outdated_beers = filtered_old.filter(e => !filtered_new.includes(e))
-    console.log(outdated_beers)
+    transaction.commit(function(err) {
+      if(err){
+        console.log("Transaction failed: " + err.message)
+      } else {
+        db.beginTransaction(function(err, transaction2) {
+          transaction2.run("DELETE FROM "+tableName+" WHERE last_updated < ?", [date]);
+          transaction2.commit(function(err) {
+            if(err){
+              console.log(err.message)
+            } else {
+              console.log(store + " updated successfully!")
+            }
+          });
+        });
+
+      }
+    });
   });
 
-  // Array.prototype.diff = arr1.filter(x => arr2.includes(x));
-
-
-  // console.log(outdated_beers)
+  // console.log(filtered_new);
 
 }
 
@@ -149,13 +119,12 @@ async function updateStore(store){
 Fetches all beers from the selected Vinmonopolet store (@param store) through the API
 and inserts them into the database.
 
-@Param exists tells the function if the table already exists. If true, update the last_updated on the corresponding store table,
-if false, tells the function to create the corresponding table.
+@param Store (string), which store to fetch the beers from. Creates table if it does not already exist.
 */
-async function getFromVinmonopolet(store, exists){
+async function getFromVinmonopolet(store){
   const tableName = formatName(store)
   console.log("Querying store: "+tableName)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT UNIQUE, stockLevel INTEGER NOT NULL, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
+  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT UNIQUE, stockLevel INTEGER NOT NULL, last_updated DATETIME, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
 
   const facets = await vinmonopolet.getFacets();
   const storeFacet = facets.find(facet => facet.name === 'Butikker')
@@ -171,6 +140,7 @@ async function getFromVinmonopolet(store, exists){
   db.beginTransaction(function(err, transaction) {
     async function insert(){
       var t0 = Date.now(); //used for time measurement
+      var date = new Date().toISOString();
       while(pagination.hasNext){
         for(i=0; i<products.length; i++) {
           if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
@@ -182,8 +152,8 @@ async function getFromVinmonopolet(store, exists){
             var abv = products[i].abv
             // console.log(products[i])
             // console.log(type)
-            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",00000,69.0,11111,70.0,69.5,price,type,abv])
-            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?)', [code,stockLevel])
+            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",null,null,null,null,null,price,type,abv])
+            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?)', [code,stockLevel,date])
           }
         }
         const response = await pagination.next()
@@ -203,7 +173,6 @@ async function getFromVinmonopolet(store, exists){
     }
     insert();
   });
-  createOrUpdate(store,exists)
 }
 
 db.getAsync = function(sql) {
@@ -238,7 +207,7 @@ function getIdsTest(){
   });
 }
 
-
+// getFromVinmonopolet("Trondheim, Bankkvartalet");
 getIdsTest();
 // api.getBID("hei")
 // updateStore("Trondheim, Bankkvartalet");
