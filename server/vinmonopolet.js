@@ -30,6 +30,28 @@ function formatName(name) {
   }
 }
 
+function getAllStores(){
+    db.run('CREATE TABLE IF NOT EXISTS stores (store_id INTEGER PRIMARY KEY, name TEXT, tableName TEXT, category INTEGER, address TEXT, city TEXT, zip INTEGER, lon REAL, lat REAL)');
+    db.beginTransaction(function (err, transaction) {
+
+      vinmonopolet.stream.getStores().on('data', function(store) {
+        var tableName = formatName(store.name)
+        var category = store.category.substr(-1);
+        transaction.run("INSERT OR IGNORE INTO stores VALUES(?,?,?,?,?,?,?,?,?)",[store.butikknummer, store.name, tableName, category, store.streetAddress, store.streetCity, store.postalZip, store.longitude, store.latitude])
+      }).on('end', function() {
+        transaction.commit(function(err) {
+          if(err){
+            console.log("Transaction failed: " + err);
+          } else {
+            console.log('Done!');
+          }
+        });
+      });
+
+    });
+
+}
+
 
 /*
 Fetches ALL beers from vinmonopolet and writes them to the Beer table.
@@ -110,8 +132,6 @@ async function updateStore(store){
       }
     });
   });
-
-  // console.log(filtered_new);
 
 }
 
@@ -207,8 +227,9 @@ function getIdsTest(){
   });
 }
 
+getAllStores();
 // getFromVinmonopolet("Trondheim, Bankkvartalet");
-getIdsTest();
+// getIdsTest();
 // api.getBID("hei")
 // updateStore("Trondheim, Bankkvartalet");
 // api.test("Nøgne Ø Porter");

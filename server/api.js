@@ -136,7 +136,7 @@ test : function(input){
         });
       }, function done(e) {
         if(e){
-          console.log(e);
+          console.log(e)
           resolve(updatedBeers);
         } else {
           resolve(updatedBeers);
