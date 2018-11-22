@@ -7,7 +7,7 @@ var async = require('async');
 const clientID = config.unt_clientId;
 const clientSecret = config.unt_clientSecret;
 
-var options = {
+var options_BID = {
     uri: 'https://api.untappd.com/v4/search/beer',
     qs: {
         client_id: clientID, // -> uri + '?access_token=xxxxx%20xxxxx'
@@ -21,15 +21,29 @@ var options = {
     resolveWithFullResponse: true
 };
 
+var options_SCORE = {
+    uri: 'https://api.untappd.com/v4/beer/info/',
+    qs: {
+        client_id: clientID, // -> uri + '?access_token=xxxxx%20xxxxx'
+        client_secret: clientSecret
+    },
+    headers: {
+        'User-Agent': 'Request-Promise'
+    },
+    json: true, // Automatically parses the JSON string in the response
+    resolveWithFullResponse: true
+};
+
+
 var words = ["Dobbel","APA","IPA","Imperial","Stout","2017", "2018", "2016", "2015", "Red Ale", "Witbier", "Doppelbock", "Hefeweissbier", "Pastry", "Quadrupel", "Coffee", "Amber Ale", "Porter", "Barley Wine", "Saison", "Red IPA", "Amber", "American Barley Wine"];
 
 function getBID(row){
   return new Promise(function (resolve, reject){
     var new_name = formatName(row.vmp_name)
     // console.log(new_name)
-    options.qs.q = new_name;
-        // options.qs.q = row.vmp_name;
-        request(options).then(function(res) {
+    // options_BID.qs.q = new_name;
+        options_BID.qs.q = row.vmp_name;
+        request(options_BID).then(function(res) {
           var remaining = res.headers['x-ratelimit-remaining'];
           var count = res.body.response.beers.count;
           // console.log(res.body.response.beers.items[0].beer.bid);
@@ -54,10 +68,43 @@ function getBID(row){
 
           }
     }).catch(function (err) {
-      reject("API limit reached for this hour");
+      reject(err.message);
     });
 
   });//Klamma her
+}
+
+function getScore(row){
+  // console.log(row)
+  return new Promise(function (resolve, reject){
+    var data = JSON.parse(row.data);
+    var options = options_SCORE;
+    options.uri = 'https://api.untappd.com/v4/beer/info/'+row.untappd_id;
+    // console.log(options_SCORE)
+    request(options).then(function(res) {
+      var remaining = res.headers['x-ratelimit-remaining'];
+      if(res.statusCode == 200 && remaining >=1){
+        console.log(remaining);
+        row.untappd_name = res.body.response.beer.beer_name;
+        row.untapped_score = res.body.response.beer.rating_score;
+        row.untappd_ratings = res.body.response.beer.rating_count;
+        data.untappd_url = res.body.response.beer.beer_slug + "/"+res.body.response.beer.bid;
+        data.picture_url = res.body.response.beer.beer_label_hd;
+        data.brewery = res.body.response.beer.brewery_name;
+        data.sub_category = res.body.response.beer.beer_style;
+        row.data = JSON.stringify(data);
+        resolve(row)
+      } else {
+        if(res.headers['status'] == 429){
+          reject("API limit reached for this hour");
+        } else {
+          reject("The API encountered an error, statusCode " + res.statusCode);
+        }
+      }
+    }).catch(function (err) {
+      reject("The API encountered an error: " + err.message);
+    })
+  });
 }
 
 /*
@@ -141,9 +188,30 @@ test : function(input){
 
   getBIDs : function(rows){
     return new Promise(function(resolve, reject) {
-      updatedBeers = [];
+      var updatedBeers = [];
       async.eachSeries(rows, function(item,callback){
         getBID(item).then((updatedItem) => {
+          updatedBeers.push(updatedItem);
+          callback();
+        }).catch((err) => {
+          return callback(err);
+        });
+      }, function done(e) {
+        if(e){
+          console.log(e)
+          resolve(updatedBeers);
+        } else {
+          resolve(updatedBeers);
+        }
+      });
+    });
+  },
+
+  getScores: function(rows){
+    return new Promise(function(resolve, reject) {
+      var updatedBeers = [];
+      async.eachSeries(rows, function(item,callback){
+        getScore(item).then((updatedItem) => {
           updatedBeers.push(updatedItem);
           callback();
         }).catch((err) => {
