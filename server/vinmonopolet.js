@@ -209,7 +209,8 @@ db.getAsync = function(sql) {
 }
 
 function getIdsTest(){
-  db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then(async function (rows) {
+    db.getAsync("SELECT * FROM beers WHERE untappd_id IS 0 OR untappd_id = ''").then(async function (rows) {
+  // db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then(async function (rows) {
     var updated_rows = await api.getBIDs(rows);
     db.beginTransaction(function(err, transaction) {
       for(i=0; i<updated_rows.length; i++){
@@ -227,9 +228,11 @@ function getIdsTest(){
   });
 }
 
-getAllStores();
+// api.test("Hogna Rødskjegg Imperial Red Ale")
+
+// getAllStores();
 // getFromVinmonopolet("Trondheim, Bankkvartalet");
-// getIdsTest();
+getIdsTest();
 // api.getBID("hei")
 // updateStore("Trondheim, Bankkvartalet");
 // api.test("Nøgne Ø Porter");

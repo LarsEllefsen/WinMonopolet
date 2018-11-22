@@ -21,11 +21,14 @@ var options = {
     resolveWithFullResponse: true
 };
 
-array = ["item1","item2","item3","item4","item5","item6"];
+var words = ["Dobbel","APA","IPA","Imperial","Stout","2017", "2018", "2016", "2015", "Red Ale", "Witbier", "Doppelbock", "Hefeweissbier", "Pastry", "Quadrupel", "Coffee", "Amber Ale", "Porter", "Barley Wine", "Saison", "Red IPA", "Amber", "American Barley Wine"];
 
 function getBID(row){
   return new Promise(function (resolve, reject){
-        options.qs.q = row.vmp_name;
+    var new_name = formatName(row.vmp_name)
+    // console.log(new_name)
+    options.qs.q = new_name;
+        // options.qs.q = row.vmp_name;
         request(options).then(function(res) {
           var remaining = res.headers['x-ratelimit-remaining'];
           var count = res.body.response.beers.count;
@@ -35,6 +38,7 @@ function getBID(row){
               if(count != 0){
                 row.untappd_id = res.body.response.beers.items[0].beer.bid;
                 row.abv = res.body.response.beers.items[0].beer.beer_abv;
+                console.log(row.vmp_name + " id found: " + row.untappd_id);
                 resolve(row);
               } else {
                 row.untappd_id = 0;
@@ -54,7 +58,18 @@ function getBID(row){
     });
 
   });//Klamma her
-  }
+}
+
+/*
+A function that tries to reformat the name of the beer coming from Vinmonopolet better search in Untappd.
+Usually this is just stripping the style at end of the name (APA, IPA, imperial stout etc), because
+vinmonopolet loves to add differnet stuff to the name.
+*/
+function formatName(name){
+    var re = new RegExp('\\b('+words.join('|')+')\\b', 'g');
+    var new_name = (name || '').replace(re,'').replace(/[]{2,}/,' ');
+    return new_name;
+}
 
 var fetchData = function (item) {
   return new Promise(function (resolve, reject){
