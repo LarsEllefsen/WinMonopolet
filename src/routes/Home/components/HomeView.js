@@ -5,7 +5,7 @@ import './HomeView.scss'
 export const HomeView = () => (
   <div>
     <h4>Whalecum!!</h4>
-    <img alt='Fuck all of yall!' className='Stuck hehe :P' src={DuckImage} />
+    <img alt='Fuck all of yall!' className='.duck' src={DuckImage} />
   </div>
 )
 

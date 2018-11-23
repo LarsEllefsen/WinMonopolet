@@ -267,7 +267,12 @@ function getScores(){
   });
 }
 
-getScores();
+db.getAsync("SELECT * FROM beers LIMIT 10").then(async function (rows) {
+  var data = JSON.parse(rows[0].data)
+  console.log(data)
+})
+
+// getScores();
 // getAllStores();
 // getFromVinmonopolet("Trondheim, Bankkvartalet");
 // getIdsTest();
