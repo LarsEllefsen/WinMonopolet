@@ -90,7 +90,7 @@ function getScore(row){
         row.untappd_ratings = res.body.response.beer.rating_count;
         data.untappd_url = res.body.response.beer.beer_slug + "/"+res.body.response.beer.bid;
         data.picture_url = res.body.response.beer.beer_label_hd;
-        data.brewery = res.body.response.beer.brewery_name;
+        row.brewery = res.body.response.beer.brewery.brewery_name;
         data.sub_category = res.body.response.beer.beer_style;
         row.data = JSON.stringify(data);
         resolve(row)
@@ -165,24 +165,10 @@ Since the naming convetion between vinmonopolet and Untappd is different, it is 
   // }
 
 test : function(input){
-  return new Promise(function(resolve, reject) {
-    var newArr = [];
-    async.eachSeries(input, function(eachitem,next){
-      testSub(eachitem.vmp_name).then((item) =>{
-        newArr.push(item);
-        console.log(item)
-        next();
-      }).catch((err) => {
-        return next(err);
-      });
-    }, function done(e) {
-      if(e){
-        console.log(e + "But these items worked: " + newArr)
-        resolve(newArr);
-      } else {
-        resolve(newArr);
-      }
-    });
+  return new Promise(async function(resolve, reject) {
+    var res = await getScore(input);
+    console.log(res.brewery)
+    resolve(res)
   });
 },
 

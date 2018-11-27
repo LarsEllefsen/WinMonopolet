@@ -16,7 +16,7 @@ let db = new TransactionDatabase(new sqlite3.Database('inv.db', (err) => {
   //Creates a table containing all the beers
   db.run('CREATE TABLE IF NOT EXISTS beers (vmp_id INTEGER PRIMARY KEY, vmp_name TEXT NOT NULL, untappd_name TEXT,' +
   'untappd_id INTEGER, untapped_score REAL, ratebeer_id INT, ratebeer_score REAL, total_score REAL, price INT,' +
-  'type TEXT, abv REAL, data TEXT, untappd_ratings INTEGER, ratebeer_ratings INTEGER, active INTEGER DEFAULT 1)', function(err) {
+  'type TEXT, abv REAL, data TEXT, untappd_ratings INTEGER, ratebeer_ratings INTEGER, active INTEGER DEFAULT 1, brewery TEXT)', function(err) {
     if (err){
       console.log(err.message)
     }
@@ -32,13 +32,12 @@ function formatName(name) {
   }
 }
 
-function jsonData(vmp_url="", containerSize="", untappd_url="", picture_url="",brewery="",sub_category=""){
+function jsonData(vmp_url="", containerSize="", untappd_url="", picture_url="",sub_category=""){
   var json = {
     "vmp_url": vmp_url,
     "container_size":  containerSize,
     "untappd_url": untappd_url,
     "picture_url": picture_url,
-    "brewery": brewery,
     "sub_category": sub_category
     }
   return json;
@@ -72,6 +71,7 @@ Fetches ALL beers from vinmonopolet and writes them to the Beer table.
 Takes a long time, so only really used for the initial DB fill or making sure the DB is up to date.
 */
 async function getAllBeers(){
+  db.run("UPDATE beers SET active = 0 WHERE active = 1");
   let {pagination, products} = await vinmonopolet.getProducts({facet: vinmonopolet.Facet.Category.BEER})
   console.log(products[0])
   db.beginTransaction(function(err, transaction) {
@@ -87,8 +87,8 @@ async function getAllBeers(){
             var json = jsonData(products[i].url,products[i].containerSize)
             var vmp_data = JSON.stringify(json);
             // transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",null,null,null,null,null,price,type,abv,vmp_data.toString()])
-            transaction.run('INSERT INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (vmp_id) DO UPDATE SET data = excluded.data',
-            [code,name,"placeholder",null,null,null,null,null,price,type,abv,vmp_data,null,null,1])
+            transaction.run('INSERT INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (vmp_id) DO UPDATE SET active = 1',
+            [code,name,"placeholder",null,null,null,null,null,price,type,abv,vmp_data,null,null,1,null])
         }
         const response = await pagination.next()
         products = response.products
@@ -189,9 +189,11 @@ async function getFromVinmonopolet(store){
             var stockLevel = products[i].chosenStoreStock.stockLevel
             var price = products[i].price
             var abv = products[i].abv
-            // console.log(products[i])
+            var json = jsonData(products[i].url,products[i].containerSize)
+            var vmp_data = JSON.stringify(json);
             // console.log(type)
-            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', [code,name,"placeholder",null,null,null,null,null,price,type,abv,null])
+            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+              [code,name,"placeholder",null,null,null,null,null,price,type,abv,vmp_data,null,null,1,null]);
             transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?)', [code,stockLevel,date])
           }
         }
@@ -227,7 +229,7 @@ db.getAsync = function(sql) {
   });
 }
 
-function getIdsTest(){
+function getIds(){
     // db.getAsync("SELECT * FROM beers WHERE untappd_id IS 0 OR untappd_id = ''").then(async function (rows) {
   db.getAsync("SELECT * FROM beers WHERE untappd_id IS NULL OR untappd_id = ''").then(async function (rows) {
     var updated_rows = await api.getBIDs(rows);
@@ -252,8 +254,8 @@ function getScores(){
     var updated_rows = await api.getScores(rows);
     db.beginTransaction(function(err, transaction) {
       for(i=0; i<updated_rows.length; i++){
-        transaction.run('UPDATE beers SET untappd_name = ?, untapped_score = ?, untappd_ratings = ?, data = ? WHERE vmp_id = ?',
-        [updated_rows[i].untappd_name, updated_rows[i].untapped_score, updated_rows[i].untappd_ratings, updated_rows[i].data, updated_rows[i].vmp_id]);
+        transaction.run('UPDATE beers SET untappd_name = ?, untapped_score = ?, untappd_ratings = ?, data = ?, brewery = ? WHERE vmp_id = ?',
+        [updated_rows[i].untappd_name, updated_rows[i].untapped_score, updated_rows[i].untappd_ratings, updated_rows[i].data, updated_rows[i].brewery ,updated_rows[i].vmp_id]);
       }
       transaction.commit(function(err) {
         if(err){
@@ -267,19 +269,20 @@ function getScores(){
   });
 }
 
-db.getAsync("SELECT * FROM beers LIMIT 10").then(async function (rows) {
-  var data = JSON.parse(rows[0].data)
-  console.log(data)
-})
+// db.getAsync("SELECT * FROM beers WHERE untappd_id = 116828").then(async function (rows) {
+//   // console.log(rows[0])
+//   api.test(rows[0]).then((res)=> {
+//     console.log(res);
+//   })
+// })
 
-// getScores();
+getScores();
 // getAllStores();
 // getFromVinmonopolet("Trondheim, Bankkvartalet");
 // getIdsTest();
 // api.getBID("hei")
 // updateStore("Trondheim, Bankkvartalet");
 // api.test("Nøgne Ø Porter");
-// getAllBeers();
 // check_store('Trondheim, Bankkvartalet')
 // check_store('Trondheim, Valentinlyst')
 // check_store('Malvik')
