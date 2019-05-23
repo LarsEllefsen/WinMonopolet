@@ -1,0 +1,9 @@
+{
+    "script": "node index.js",
+    "watch": true,
+    "ignore_watch": ["server", "node_modules", "inv.db"],
+    "watch_options": {
+        "followSymlinks": false
+    },
+    "name": "wmp"
+}

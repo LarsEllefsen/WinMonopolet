@@ -1,0 +1,38 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "rc-slider": "8.6.1",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-ga": "^2.5.7",
+    "react-geolocated": "^2.4.0",
+    "react-progressive-list": "^0.1.2",
+    "react-scripts": "2.1.1",
+    "react-spinners": "^0.4.7",
+    "react-star-ratings": "^2.3.0",
+    "react-svg": "^7.2.2",
+    "react-virtualized": "^9.21.0",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.83.0",
+    "webfontloader": "^1.6.28",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:5000",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

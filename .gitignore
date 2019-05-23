@@ -1,7 +1,34 @@
-node_modules
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+client/node_modules
+# testing
+/coverage
+
+# production
+client/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.tern-project
+
+# DB
+inv.db
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 config.js
 server\config.js
-server\ssl
-server.js
-*.key
-*.crt
+server\cursor.js
+server\logs\server_log.txt
+server\auth
+server/auth
