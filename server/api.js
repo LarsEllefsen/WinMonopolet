@@ -4,10 +4,9 @@ var request = require('request-promise-native');
 const https = require('https');
 var async = require('async');
 const logger = require("./logger.js")
-var mailgun = require('mailgun-js')(config.emailConfig);
-const clientID = config.unt_clientId;
-const clientSecret = config.unt_clientSecret;
 
+clientID = 'your-api-key-here'
+clientSecret = 'your-client-secret-here'
 
 var options_BID = {
     uri: 'https://api.untappd.com/v4/search/beer',
@@ -194,45 +193,6 @@ Since the naming convetion between vinmonopolet and Untappd is different, it is 
         }
       });
     });
-  },
-
-  sendMail: function(data){
-    return new Promise(function(resolve, reject) {
-      mailgun.messages().send(data, function (error, body) {
-        if(!error) {
-          resolve(body)
-        } else {
-          console.log(error)
-          reject(error)
-        }
-      });
-    })
-  },
-
-  sendLogs: function(){
-    return new Promise(function(resolve, reject) {
-      logs = logger.getInfoLogs()
-      if(logs){
-        attach = new mailgun.Attachment({data: logs, filename: "info_logs.txt"});
-        var data = {
-          from: 'Logger <mail@mg.winmonopolet.com>',
-          to: 'mail@winmonopolet.com',
-          subject: '[INFO LOGS] ' + logger.time_now(),
-          text: 'Info logs for winmonopolet.com are attached below',
-          attachment: attach
-        };
-
-        mailgun.messages().send(data, function (error, body) {
-          if(!error) {
-            resolve(body)
-          } else {
-            reject(error)
-          }
-        });
-      } else {
-        reject("No logs to send")
-      }
-    })
   }
 
 }
