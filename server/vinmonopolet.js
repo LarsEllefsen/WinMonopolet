@@ -1,5 +1,4 @@
 const vinmonopolet = require('vinmonopolet');
-const config = require('./config.js')
 const api = require('./api.js')
 const cron = require('node-cron')
 var async = require('async');
@@ -86,7 +85,13 @@ Takes a long time, so only really used for the initial DB fill or making sure th
 async function getAllBeers(){
   return new Promise(async function (resolve, reject){
     db.run("UPDATE beers SET active = 0 WHERE active = 1");
-    products = await fetchFromApi()
+    let {pagination, products} = await vinmonopolet.getProducts({facet: vinmonopolet.Facet.Category.BEER})
+    while (pagination.hasNext) {
+      const response = await pagination.next()
+      products = products.concat(response.products)
+      pagination = response.pagination
+    }
+
     db.beginTransaction(function(err, transaction) {
       async function insert(){
         var t0 = Date.now(); //used for time measurement
@@ -112,6 +117,7 @@ async function getAllBeers(){
           reject(err.message);
         } else {
           var t1 = Date.now();
+          console.log("Hell yeah")
           resolve(true);
         }
       });
@@ -163,7 +169,17 @@ async function updateStore(store){
     const tableName = formatName(store)
     db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT UNIQUE, stockLevel INTEGER NOT NULL, last_updated DATETIME, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
 
-    var products = await fetchFromApi(store)
+    const facets = await vinmonopolet.getFacets();
+    const storeFacet = facets.find(facet => facet.name === 'Butikker')
+    const storeFacetValue = storeFacet.values.find(val => val.name === store)
+    const beer = vinmonopolet.Facet.Category.BEER
+
+    let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
+    while (pagination.hasNext) {
+      const response = await pagination.next()
+      products = products.concat(response.products)
+      pagination = response.pagination
+    }
 
     db.beginTransaction(async function(err, transaction) {
       var date = new Date().toISOString();
@@ -180,6 +196,7 @@ async function updateStore(store){
               if(err){
                 reject(err)
               } else {
+                console.log("hei")
                 resolve(true)
               }
             });
@@ -500,6 +517,8 @@ cron.schedule('0 0 2 * * *', () => {
     logger.log("updateLeastRated encountered an error: " + err)
   });
 });
+
+updateStore("Skien")
 
 
 module.exports = {

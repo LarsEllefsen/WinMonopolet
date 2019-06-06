@@ -1,5 +1,4 @@
 //Imports
-var config = require("./config.js")
 var request = require('request-promise-native');
 const https = require('https');
 var async = require('async');
