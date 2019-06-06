@@ -117,45 +117,12 @@ async function getAllBeers(){
           reject(err.message);
         } else {
           var t1 = Date.now();
-          console.log("Hell yeah")
           resolve(true);
         }
       });
     }
       insert();
     });
-  })
-}
-
-/*
-A method for streaming all beers from Vinmonopolet through our heroku proxy.
-This is needed to avoid heroku request timeouts, as it is a lengthy operation.
-*/
-async function fetchFromApi(store=null){
-  if(store === null){
-    endpoint = 'getAllBeers'
-  } else {
-    endpoint = 'getStoreInventory/' + store
-  }
-  var options = {
-      uri: 'http://wmp-backend.herokuapp.com/api/' + endpoint,
-      headers: {
-          'User-Agent': 'Request-Promise'
-      },
-      json: true, // Automatically parses the JSON string in the response
-      resolveWithFullResponse: true
-  };
-  return new Promise(async function (resolve, reject){
-    var allProducts = []
-    request(options)
-    .pipe(jsonstream.parse())
-    .on('data', function(product){
-      allProducts.push(product)
-    })
-    .on('end', function() {
-      resolve(allProducts)
-    })
-
   })
 }
 
@@ -196,7 +163,6 @@ async function updateStore(store){
               if(err){
                 reject(err)
               } else {
-                console.log("hei")
                 resolve(true)
               }
             });
@@ -209,63 +175,7 @@ async function updateStore(store){
 
 }
 
-/*
-Fetches all beers from the selected Vinmonopolet store (@param store) through the API
-and inserts them into the database.
-
-@param Store (string), which store to fetch the beers from. Creates table if it does not already exist.
-*/
-async function getFromVinmonopolet(store){
-  const tableName = formatName(store)
-  db.run('CREATE TABLE IF NOT EXISTS '+tableName+' (vmp_id INT UNIQUE, stockLevel INTEGER NOT NULL, last_updated DATETIME, FOREIGN KEY(vmp_id) REFERENCES beers(vmp_id))');
-
-  const facets = await vinmonopolet.getFacets();
-  const storeFacet = facets.find(facet => facet.name === 'Butikker');
-  const storeFacetValue = storeFacet.values.find(val => val.name === store)
-  const beer = vinmonopolet.Facet.Category.BEER;
-
-  let {pagination, products} = await vinmonopolet.getProducts({facet: [storeFacetValue,beer]})
-  db.beginTransaction(function(err, transaction) {
-    async function insert(){
-      var t0 = Date.now(); //used for time measurement
-      var date = new Date().toISOString();
-      while(pagination.hasNext){
-        for(i=0; i<products.length; i++) {
-          if(products[i].chosenStoreStock.stockLevelStatus == 'inStock') {
-            var code = products[i].code
-            var name = products[i].name
-            var type = products[i].mainSubCategory.name
-            var stockLevel = products[i].chosenStoreStock.stockLevel
-            var price = products[i].price
-            var abv = products[i].abv
-            var json = jsonData(products[i].url,products[i].containerSize)
-            var vmp_data = JSON.stringify(json);
-            var isNew = 0
-            if(products[i].newProduct == true){
-              isNew = 1
-            }
-            transaction.run('INSERT OR IGNORE INTO beers VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-              [code,name,"Placeholder",null,null,null,null,null,price,type,abv,vmp_data,null,null,1,null, isNew]);
-            transaction.run('INSERT OR IGNORE INTO '+tableName+' VALUES (?,?,?)', [code,stockLevel,date])
-          }
-        }
-        const response = await pagination.next()
-        products = response.products
-        pagination = response.pagination
-      }
-      //END TRANSACTION
-      transaction.commit(function(err) {
-        if(err){
-          logger.log("Transaction failed for getFromVinmonopolet: " + err.message)
-        } else {
-          var t1 = Date.now();
-        }
-      });
-    }
-    insert();
-  });
-}
-
+/* Promise wrapper for database statements*/
 db.getAsync = function(sql) {
   var that = this;
   return new Promise(function(resolve, reject){
@@ -518,8 +428,6 @@ cron.schedule('0 0 2 * * *', () => {
   });
 });
 
-updateStore("Skien")
-
 
 module.exports = {
 
@@ -545,6 +453,7 @@ module.exports = {
     });
   },
 
+/* Fetches beers for the admin panel */
   getBeersAdmin: async function(type){
     return new Promise(function(resolve, reject) {
       var query = ''
