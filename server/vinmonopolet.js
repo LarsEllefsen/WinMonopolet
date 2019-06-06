@@ -84,7 +84,6 @@ Takes a long time, so only really used for the initial DB fill or making sure th
 */
 async function getAllBeers(){
   return new Promise(async function (resolve, reject){
-    db.run("UPDATE beers SET active = 0 WHERE active = 1");
     let {pagination, products} = await vinmonopolet.getProducts({facet: vinmonopolet.Facet.Category.BEER})
     while (pagination.hasNext) {
       const response = await pagination.next()
@@ -93,6 +92,7 @@ async function getAllBeers(){
     }
 
     db.beginTransaction(function(err, transaction) {
+      db.run("UPDATE beers SET active = 0 WHERE active = 1");
       async function insert(){
         var t0 = Date.now(); //used for time measurement
         for(i=0; i<products.length; i++) {
@@ -428,6 +428,7 @@ cron.schedule('0 0 2 * * *', () => {
   });
 });
 
+getAllBeers()
 
 module.exports = {
 
