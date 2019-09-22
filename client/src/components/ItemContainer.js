@@ -80,7 +80,7 @@ function ItemContainer(props){
                 <span>Styrke: {beer.abv}%</span> 
                 <span>Størrelse: {beer_data.container_size}cl</span>
                   <br/>
-                <span>Pris per alkoholenhet: {pricePerUnit().toFixed(1)} kr</span>
+                <span>Pris per alkoholenhet: {pricePerUnit().toFixed(1)}kr</span>
                 <span>På lager: {beer.stockLevel}</span></h4></Grid.Column>
             </Grid.Row>
           </Grid.Column>
