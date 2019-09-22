@@ -46,6 +46,16 @@ function ItemContainer(props){
     }
   }
 
+  const units = () => {
+    return (beer.abv*beer_data.container_size);
+  }
+
+  const pricePerUnit = () => {
+      var u = units();
+      return beer.price/u;
+  }
+
+
   if(window.innerWidth >= 700) {
   return(
 
@@ -65,7 +75,13 @@ function ItemContainer(props){
             <Grid.Row><h3 className="brewery_name">{brewery()}</h3></Grid.Row>
             <Grid.Row> <b className="beer_style">{beer_data.sub_category.toUpperCase()}</b></Grid.Row>
             <Grid.Row >
-              <Grid.Column><h4 className="beer_details"><span>Pris: {beer.price}kr</span>  <span>Styrke: {beer.abv}%</span> <span>Størrelse: {beer_data.container_size}cl</span> <span>På lager: {beer.stockLevel}</span></h4></Grid.Column>
+              <Grid.Column><h4 className="beer_details">
+                <span>Pris: {beer.price}kr</span>
+                <span>Styrke: {beer.abv}%</span> 
+                <span>Størrelse: {beer_data.container_size}cl</span>
+                  <br/>
+                <span>Pris per alkoholenhet: {pricePerUnit().toFixed(1)} kr</span>
+                <span>På lager: {beer.stockLevel}</span></h4></Grid.Column>
             </Grid.Row>
           </Grid.Column>
           <Grid.Column width={4}>
