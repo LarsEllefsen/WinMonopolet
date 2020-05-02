@@ -10,6 +10,16 @@ const AVOID_STATE_IN_CONSTRUCTORS = {
   "react/state-in-constructor": [1, "never"],
 };
 
+const ALLOW_JSX_IN_FILES_WITH_JS_EXTENSION = {
+  // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-filename-extension.md
+  "react/jsx-filename-extension": 0,
+};
+
+const DO_NOT_VALIDATE_PROP_TYPES = {
+  // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md
+  "react/prop-types": 0,
+};
+
 module.exports = {
   plugins: ["prettier", "simple-import-sort"],
   parser: "babel-eslint",
@@ -25,5 +35,7 @@ module.exports = {
     "prettier/prettier": "error",
     ...SIMPLE_IMPORT_SORT_RULE_SET,
     ...AVOID_STATE_IN_CONSTRUCTORS,
+    ...ALLOW_JSX_IN_FILES_WITH_JS_EXTENSION,
+    ...DO_NOT_VALIDATE_PROP_TYPES,
   },
 };
