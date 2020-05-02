@@ -5,6 +5,11 @@ const SIMPLE_IMPORT_SORT_RULE_SET = {
   "import/order": "off",
 };
 
+const AVOID_STATE_IN_CONSTRUCTORS = {
+  // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/state-in-constructor.md
+  "react/state-in-constructor": [1, "never"],
+};
+
 module.exports = {
   plugins: ["prettier", "simple-import-sort"],
   parser: "babel-eslint",
@@ -19,5 +24,6 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
     ...SIMPLE_IMPORT_SORT_RULE_SET,
+    ...AVOID_STATE_IN_CONSTRUCTORS,
   },
 };
