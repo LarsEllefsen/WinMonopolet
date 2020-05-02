@@ -3,9 +3,10 @@ var request = require('request-promise-native');
 const https = require('https');
 var async = require('async');
 const logger = require("./logger.js")
+const config = require('config') // Loads application parameters based on NODE_ENV; see `/config/default.js` for an introduction
 
-clientID = 'your-api-key-here'
-clientSecret = 'your-client-secret-here'
+const clientID = config.get("untappd.clientID");
+const clientSecret = config.get("untappd.clientSecret");
 
 var options_BID = {
     uri: 'https://api.untappd.com/v4/search/beer',
