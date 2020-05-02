@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "lodash": "4.17.13",
     "rc-slider": "8.6.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
@@ -17,8 +18,7 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.83.0",
     "webfontloader": "^1.6.28",
-    "whatwg-fetch": "^3.0.0",
-    "lodash": "4.17.13"
+    "whatwg-fetch": "^3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
