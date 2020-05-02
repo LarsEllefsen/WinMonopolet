@@ -32,3 +32,7 @@ server\cursor.js
 server\logs\server_log.txt
 server\auth
 server/auth
+
+# Within the realms of the `config` node package, machine-specific and secret information and secret information
+# should be stored in file with a name containing "local"
+config/*local*
