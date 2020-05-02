@@ -24,5 +24,8 @@
     "test": "test"
   },
   "author": "Lars Moe Ellefsen",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^2.0.5"
+  }
 }
