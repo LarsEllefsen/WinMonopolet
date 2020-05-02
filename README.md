@@ -15,4 +15,5 @@ and running `asdf install` before repeating the steps above.
 
 ## Fetching data from Untappd
 The site uses the untappd-api to fetch beer info during the fetch/update routine, which runs nightly. 
-If you wish to use this, go to `server/api.js` and change `clientID` and `clientSecret` with your own API key. If not the site will work normally, but will got be able to run the nightly update routine.
+If you wish to use this, go to `server/api.js` and change `clientID` and `clientSecret` with your own API key. If not the site will work normally, but will got be able to run the nightly update routine. 
+Register for an API key on [Untappd's registration page](https://untappd.com/api/register).
