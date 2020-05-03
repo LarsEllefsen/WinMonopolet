@@ -20,6 +20,11 @@ const DO_NOT_VALIDATE_PROP_TYPES = {
   "react/prop-types": 0,
 };
 
+const ALLOW_UNDERSCORES_WITHIN_CLASSES = {
+  // https://eslint.org/docs/rules/no-underscore-dangle
+  "no-underscore-dangle": ["error", { allowAfterThis: true }],
+};
+
 module.exports = {
   plugins: ["prettier", "simple-import-sort"],
   parser: "babel-eslint",
@@ -37,5 +42,6 @@ module.exports = {
     ...AVOID_STATE_IN_CONSTRUCTORS,
     ...ALLOW_JSX_IN_FILES_WITH_JS_EXTENSION,
     ...DO_NOT_VALIDATE_PROP_TYPES,
+    ...ALLOW_UNDERSCORES_WITHIN_CLASSES,
   },
 };
