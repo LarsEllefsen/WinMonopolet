@@ -10,7 +10,7 @@
     "express": "^4.16.4",
     "http": "^0.0.0",
     "https": "^1.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mailgun-js": "^0.22.0",
     "ndjson": "^1.5.0",
     "node-cron": "^2.0.3",
