@@ -1,0 +1,32 @@
+import { Module } from '@nestjs/common';
+import { AdminController } from './admin.controller';
+import { UsersModule } from '@modules/users/users.module';
+import { AdminService } from './admin.service';
+import { BullModule } from '@nestjs/bull';
+import {
+	FIVE_MINUTES_IN_MILLISECONDS,
+	ONE_HOUR_IN_MILLISECONDS,
+} from '@common/constants';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+	imports: [
+		JwtModule,
+		ConfigModule,
+		UsersModule,
+		BullModule.registerQueue({
+			name: 'user',
+			defaultJobOptions: {
+				attempts: 10,
+				backoff: { type: 'fixed', delay: ONE_HOUR_IN_MILLISECONDS },
+				timeout: FIVE_MINUTES_IN_MILLISECONDS,
+				removeOnComplete: true,
+			},
+		}),
+	],
+	controllers: [AdminController],
+	providers: [AdminService],
+	exports: [],
+})
+export class AdminModule {}

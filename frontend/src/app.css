@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	font-family: 'Libre Franklin', sans-serif;
+	/* font-family: 'Fira Sans', sans-serif; */
+}
+
+:root {
+	--wmp-light: #5a65e4;
+	--wmp-primary: #3e4cdf;
+	--wmp-dark: #2231d3;
+	--wmp-darker: #1d29af;
+
+	--ida-blue: #b3caff;
+
+	--toastContainerTop: auto;
+	--toastContainerRight: auto;
+	--toastContainerBottom: 8rem;
+	--toastContainerLeft: calc(50vw - 8rem);
+	--toastBarHeight: 0;
+	--toastBorderRadius: 0.5rem;
+	--toastMsgPadding: 1rem;
+}
+
+@layer components {
+	.background-color-slide {
+		--initialTextColor: #000000;
+		--slideTextColor: black;
+
+		--initialBgColor: #ffffff;
+		--slideBgColor: var(--ida-blue);
+
+		color: var(--initialTextColor);
+
+		background-image: linear-gradient(
+			90deg,
+			var(--initialBgColor) 0%,
+			var(--initialBgColor) 50%,
+			var(--slideBgColor) 50%,
+			var(--slideBgColor) 100%
+		);
+		background-size: 200%;
+		transition-delay: 0s, 0.15s;
+	}
+
+	.background-color-slide:active,
+	.background-color-slide:focus {
+		transition: none;
+		background-position: -100% 100%;
+	}
+
+	@media screen(lg) {
+		.background-color-slide,
+		.background-color-slide:focus,
+		.background-color-slide:active {
+			transition: background-position 0.3s cubic-bezier(0.47, 0.1, 1, 0.63), color 0.2s ease-out;
+		}
+
+		.background-color-slide:hover {
+			color: var(--slideTextColor);
+			cursor: pointer;
+			background-position: -100% 100%;
+		}
+	}
+
+	.text-link {
+		text-decoration: underline;
+		text-underline-offset: 2px;
+		font-weight: 600;
+		color: var(--wmp-primary);
+	}
+
+	.text-link:hover {
+		text-decoration: none;
+		text-underline-offset: 2px;
+		font-weight: 600;
+		color: var(--wmp-darker);
+	}
+}

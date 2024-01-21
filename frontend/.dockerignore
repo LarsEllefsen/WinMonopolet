@@ -1,0 +1,9 @@
+node_modules
+dist
+test
+.gitignore
+.env
+.prettierrc
+.jest.config.js
+README.md
+.svelte-kit

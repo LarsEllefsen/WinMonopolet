@@ -1,1 +1,0 @@
-23.05.2019 - 12:24.56  getStores route encountered an error: SQLITE_ERROR: no such table: stores

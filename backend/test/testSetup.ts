@@ -1,0 +1,1 @@
+process.env.ACCESS_TOKEN_ENCRYPTION_KEY = 'ITS_A_TEST';
