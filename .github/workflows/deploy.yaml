@@ -1,0 +1,24 @@
+name: deploy
+run-name: Deploy Winmonopoelt to winmonopolet.no
+on:
+  push:
+    branches: [github-actions]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and deploy on remote
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USERNAME}}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            node --version
+            cd ${{secrets.WORK_DIR}}
+            git checkout github-actions 
+            git pull
+            sudo docker compose up -d
+            echo 'Deploy successful'

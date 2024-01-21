@@ -5,11 +5,23 @@ services:
       - "8080:8080"
     environment:
       - API_URL=http://backend:3000
+      - UNTAPPD_CLIENT_ID=8EFD86CF047071CECC3B24D0CA0B36D5FCCC4AD0
+      - UNTAPPD_CLIENT_SECRET=https://api.untappd.com/v4/
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET}
 
   backend:
     build: ./backend
     environment:
       - UNTAPPD_BASE_URL=https://api.untappd.com/v4/
+      - UNTAPPD_CLIENT_ID=8EFD86CF047071CECC3B24D0CA0B36D5FCCC4AD0
+      - UNTAPPD_CLIENT_SECRET=https://api.untappd.com/v4/
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USERNAME=${DB_USERNAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - ACCESS_TOKEN_ENCRYPTION_KEY=${ACCESS_TOKEN_ENCRYPTION_KEY}
+      - ADMIN_USER_ID=${ADMIN_USER_ID}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
 
   redis:
     image: redis:latest
