@@ -18,7 +18,6 @@
 	};
 
 	const onPageScroll = () => {
-		console.log(maxLength);
 		if (limiter >= maxLength) return;
 		const remainingScroll = document.body.scrollHeight - window.innerHeight - window.scrollY;
 

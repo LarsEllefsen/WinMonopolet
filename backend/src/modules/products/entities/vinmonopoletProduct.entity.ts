@@ -70,6 +70,7 @@ export class VinmonopoletProduct {
 	@BeforeInsert()
 	@BeforeUpdate()
 	setUpdated() {
+		this.active = 1;
 		this.last_updated = new Date();
 	}
 
