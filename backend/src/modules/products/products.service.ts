@@ -11,12 +11,8 @@ import { WordlistService } from '@modules/wordlist/wordlist.service';
 import { productCategories } from '@common/constants';
 import { Word } from '@modules/wordlist/entities/word';
 import { ProductsStatCollector } from './productsStatCollector';
-import { Queue } from 'bull';
 import { Store } from '@modules/stores/entities/stores.entity';
-import { FacetValue } from 'vinmonopolet-ts';
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
-import { Exception } from '@common/types/Exception';
-import { TooManyRequestsException } from '@exceptions/TooManyRequestsException';
 
 type ProcessVinmonopoletProducts = {
 	apiLimitReached: boolean;
@@ -182,7 +178,7 @@ export class ProductsService {
 	 */
 	async getProductsByStore(store: Store) {
 		let allProducts = [] as VinmonopoletProductWithStockLevel[];
-		let getUntappdProducts = true;
+		let getUntappdProducts = false;
 
 		for (const productCategory of productCategories) {
 			const products = await this.vinmonopoletService.getAllProductsByStore(
@@ -203,26 +199,6 @@ export class ProductsService {
 		}
 
 		return allProducts;
-	}
-
-	shuffle(array: any[]) {
-		let currentIndex = array.length,
-			randomIndex;
-
-		// While there remain elements to shuffle.
-		while (currentIndex > 0) {
-			// Pick a remaining element.
-			randomIndex = Math.floor(Math.random() * currentIndex);
-			currentIndex--;
-
-			// And swap it with the current element.
-			[array[currentIndex], array[randomIndex]] = [
-				array[randomIndex],
-				array[currentIndex],
-			];
-		}
-
-		return array;
 	}
 
 	/**
