@@ -2,8 +2,11 @@
 	import type { Store } from '../../../types/store';
 	import AddFavoriteButton from './AddFavoriteButton.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	export let store: Store;
+
+	let isLoggedIn = $page.data.isAuthenticated;
 
 	const addFavoriteStore = () => {
 		return fetch('/api/user/favorite_stores', {
@@ -44,5 +47,7 @@
 			</div>
 		</a>
 	</div>
-	<AddFavoriteButton isFavorite={store.favorite} on:click={handleAddFavoriteClick} />
+	{#if isLoggedIn}
+		<AddFavoriteButton isFavorite={store.favorite} on:click={handleAddFavoriteClick} />
+	{/if}
 </li>
