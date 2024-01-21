@@ -24,7 +24,6 @@ const eventWithSessionDataFromServer = async (
 		throw new Error('Unable to get user info: No SessionToken found');
 
 	const sessionToken = event.locals.session.token;
-	console.log({ route: event.route });
 	const { user, sessionCookie } = await refreshSession(sessionToken);
 	event.locals.session = { user, token: sessionToken };
 	event.cookies.set('session-data', sessionCookie, { path: '/' });
@@ -51,7 +50,6 @@ const getEventWithUserInfo = async (
 };
 
 const authorization: Handle = async ({ event, resolve }) => {
-	console.time('authorization');
 	try {
 		const sessionTokenCookie = event.cookies.get('session-token');
 		if (sessionTokenCookie) {
@@ -62,7 +60,6 @@ const authorization: Handle = async ({ event, resolve }) => {
 		console.trace(error);
 		event.locals.errorDuringLogin = true;
 	}
-	console.timeEnd('authorization');
 	return resolve(event);
 };
 
