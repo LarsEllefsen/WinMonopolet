@@ -70,7 +70,6 @@ export class UntappdClient {
 	}
 
 	getBeerInfo(untappd_id: string) {
-		console.log('Get beer info');
 		return this.GET<{ response: GetBeerInfoResponseDTO }>(
 			`beer/info/${untappd_id}`,
 			this.baseQueryParams,
@@ -84,7 +83,6 @@ export class UntappdClient {
 	}
 
 	getUserInfo(accessToken: string) {
-		console.log('Get user info');
 		return this.GET<{ response: { user: UntappdUserDTO } }>(`user/info`, {
 			access_token: accessToken,
 		}).pipe(
@@ -93,7 +91,6 @@ export class UntappdClient {
 	}
 
 	getUserProducts(offset: number, accessToken: string) {
-		console.log('Get beer user products with offset ' + offset);
 		return this.GET<{ response: GetUserProductResponseDTO }>(`user/beers`, {
 			access_token: accessToken,
 			limit: 50,

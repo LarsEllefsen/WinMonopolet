@@ -26,7 +26,6 @@
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
 					geolocationPosition = position.coords;
-					console.log({ geolocationPosition });
 				},
 				(error) => {
 					console.error(error.message);

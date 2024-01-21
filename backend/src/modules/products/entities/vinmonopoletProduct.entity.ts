@@ -7,15 +7,11 @@ import {
 	Entity,
 	OneToOne,
 	PrimaryColumn,
-	UpdateDateColumn,
 } from 'typeorm';
 import { UntappdProduct } from './untappdProduct.entity';
-import { IsDateString, IsOptional } from 'class-validator';
+import { IsDateString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-	ONE_WEEK_IN_MILLISECONDS,
-	TWO_WEEKS_IN_MILLISECONDS,
-} from '@common/constants';
+import { TWO_WEEKS_IN_MILLISECONDS } from '@common/constants';
 
 @Entity('vinmonopolet_products')
 export class VinmonopoletProduct {
@@ -81,13 +77,6 @@ export class VinmonopoletProduct {
 	setIsNew() {
 		const today = new Date();
 		const added = this.added_date as Date;
-		if (this.vmp_id === '16443502') {
-			console.log({
-				today: today.getTime(),
-				added: added.getTime(),
-				diff: today.getTime() - added.getTime(),
-			});
-		}
 		if (today.getTime() - added.getTime() <= TWO_WEEKS_IN_MILLISECONDS) {
 			this.is_new = true;
 		} else {

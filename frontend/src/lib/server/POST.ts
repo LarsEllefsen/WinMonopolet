@@ -33,10 +33,9 @@ export const POST = async <T>(
 
 	let data;
 	try {
-		console.log(response.bodyUsed);
 		data = await response.json();
 	} catch (error) {
-		console.log();
+		console.error('Unable to parse response as JSON');
 	}
 
 	return data as T;
