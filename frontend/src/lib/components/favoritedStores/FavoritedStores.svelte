@@ -24,7 +24,6 @@
 	}
 	$: {
 		if (newStoreAdded) {
-			console.log('TRIGGER SOMETHING');
 			setTimeout(() => {
 				newStoreAdded = false;
 			}, 500);
