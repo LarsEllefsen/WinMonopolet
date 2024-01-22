@@ -2,6 +2,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Collapsible from '$lib/components/collapsible/Collapsible.svelte';
+	import PageLayout from '$lib/views/layout/PageLayout.svelte';
 	import { toast } from '@zerodevx/svelte-toast';
 	import Remove from 'virtual:icons/mdi/remove';
 
@@ -36,7 +37,7 @@
 	$: favoriteStores = $page.data.stores.filter((store) => store.favorite);
 </script>
 
-<div class="container mx-auto lg:mt-24 mt-4 p-4">
+<PageLayout>
 	<div class="grid grid-cols-12 lg:gap-y-8 gap-y-4">
 		<div class="lg:col-start-4 lg:col-span-6 col-span-full">
 			<h1 class="lg:text-5xl text-4xl text-center lg:mb-24 mb-4">Din profil</h1>
@@ -119,4 +120,4 @@
 			>
 		</div>
 	</div>
-</div>
+</PageLayout>

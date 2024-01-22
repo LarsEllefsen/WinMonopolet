@@ -1,10 +1,11 @@
 <script>
-	import PrimaryButton from '$lib/components/button/PrimaryButton.svelte';
+	import Heading from '$lib/components/heading/Heading.svelte';
+	import PageLayout from '$lib/views/layout/PageLayout.svelte';
 	import PayPalLogo from 'virtual:icons/mingcute/paypal-fill';
 </script>
 
-<div class="container mx-auto md:mt-12 mt-8 p-4">
-	<h1 class="md:text-5xl text-4xl text-center mb-8">Ønsker du å bidra?</h1>
+<PageLayout>
+	<Heading level={1} class="text-center">Ønsker du å bidra?</Heading>
 	<div class="grid grid-cols-12 gap-y-12">
 		<div class="md:col-span-6 md:col-start-4 col-span-full">
 			<p>
@@ -21,7 +22,7 @@
 		</div>
 
 		<div class="md:col-span-6 md:col-start-4 col-span-full">
-			<h2 class="text-2xl mb-4">Donere</h2>
+			<Heading level={2}>Donere</Heading>
 			<p>
 				Hvis du ønsker å bidra til kostnadene rundt driften av siden kan du donere via <a
 					class="text-link"
@@ -44,4 +45,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</PageLayout>

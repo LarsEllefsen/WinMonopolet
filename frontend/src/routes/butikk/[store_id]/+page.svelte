@@ -1,6 +1,5 @@
 <script>
-	import { beforeNavigate } from '$app/navigation';
-	import StockView from '$lib/views/stockView/StockView.svelte';
+	import StockView from '$lib/views/stock/StockView.svelte';
 </script>
 
 <StockView />

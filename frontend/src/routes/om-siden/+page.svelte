@@ -1,9 +1,11 @@
 <script lang="ts">
+	import Heading from '$lib/components/heading/Heading.svelte';
+	import PageLayout from '$lib/views/layout/PageLayout.svelte';
 	import AlertIcon from 'virtual:icons/mdi-light/alert-circle';
 </script>
 
-<div class="container mx-auto md:mt-12 mt-8 p-4">
-	<h1 class="md:text-5xl text-4xl text-center mb-8">Om siden</h1>
+<PageLayout>
+	<Heading level={1} class="text-center">Om siden</Heading>
 	<div class="grid grid-cols-12 md:mt-12 mt-4 gap-x-4 gap-y-8">
 		<div class="md:col-span-6 col-span-full flex flex-col gap-y-8">
 			<div>
@@ -60,4 +62,4 @@
 			/>
 		</div>
 	</div>
-</div>
+</PageLayout>
