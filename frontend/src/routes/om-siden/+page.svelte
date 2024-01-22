@@ -5,7 +5,7 @@
 </script>
 
 <PageLayout>
-	<Heading level={1} class="text-center">Om siden</Heading>
+	<Heading level={1} centered>Om siden</Heading>
 	<div class="grid grid-cols-12 md:mt-12 mt-4 gap-x-4 gap-y-8">
 		<div class="md:col-span-6 col-span-full flex flex-col gap-y-8">
 			<div>
