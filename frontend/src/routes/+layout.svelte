@@ -110,6 +110,7 @@
 									<ul class="*:mb-8 last:mb-0">
 										<li><Link href="/om-siden">Om siden</Link></li>
 										<li><Link href="/bidra">Bidra</Link></li>
+										<li><Link href="/kontakt">Kontakt</Link></li>
 									</ul>
 								</div>
 							</div>
