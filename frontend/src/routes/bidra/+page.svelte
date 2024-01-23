@@ -24,23 +24,33 @@
 		<div class="md:col-span-6 md:col-start-4 col-span-full">
 			<Heading level={2}>Donere</Heading>
 			<p>
-				Hvis du ønsker å bidra til kostnadene rundt driften av siden kan du donere via <a
+				Hvis du ønsker å bidra til kostnadene rundt driften og vedlikeholdt av siden kan du donere
+				via <a
 					class="text-link"
 					target="_blank"
 					href="https://www.paypal.com/donate/?hosted_button_id=2Y6AYNAR7L3T2">PayPal</a
+				>
+				eller
+				<a class="text-link" target="_blank" href="https://www.buymeacoffee.com/larsellefsen"
+					>Buy Me A Coffee</a
 				>.
 			</p>
 			<p class="mt-4">
 				Dette er <b>helt valgfritt</b> og siden kommer til å eksistere så lenge som mulighet uavhengig
 				av donasjoner. Alle donasjoner settes pris på og vil bli brukt til å dekke alle kostander rundt
-				drift av siden.
+				drift og vedlikehold av siden.
 			</p>
-			<div class="">
+			<div class="flex gap-x-4 items-center mt-8">
 				<a
 					target="_blank"
 					href="https://www.paypal.com/donate/?hosted_button_id=2Y6AYNAR7L3T2"
-					class="inline-flex items-center gap-x-2 py-4 px-6 mt-4 text-white bg-wmp rounded-md focus-visible:ring-4 hover:bg-wmp-darker focus-visible:bg-wmp-darker"
+					class="inline-flex items-center gap-x-2 py-4 px-6 text-white bg-wmp rounded-md focus-visible:ring-4 hover:bg-wmp-darker focus-visible:bg-wmp-darker"
 					><span>Doner</span> <PayPalLogo /></a
+				>
+				<a
+					href="https://www.buymeacoffee.com/larsellefsen"
+					class="bg-wmp px-4 py-4 rounded-md text-white focus-visible:ring-4 hover:bg-wmp-darker focus-visible:bg-wmp-darker"
+					>🍻 Buy me a beer</a
 				>
 			</div>
 		</div>
