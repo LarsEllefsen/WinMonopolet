@@ -93,13 +93,13 @@
 				<Hamburger open={menuState.megaMenuOpen} on:click={() => toggleMenu('megaMenuOpen')} />
 				{#if menuState.megaMenuOpen}
 					<div
-						class="absolute left-0 top-[80px] h-96 max-h-[calc(100dvh-80px)] w-full bg-white border-b border-black z-50 overflow-y-auto"
+						class="absolute left-0 top-[80px] max-h-[calc(100dvh-80px)] w-full bg-white border-b border-black z-50 overflow-y-auto"
 						transition:slide|global
 					>
 						<div class="container mx-auto px-4 py-12">
 							<div class="grid grid-cols-12 gap-y-4">
 								<div class="md:col-span-6 col-span-full flex md:justify-center">
-									<ul class=" md:mb-8 *:mb-8 last:mb-0">
+									<ul class="*:mb-8">
 										<li>
 											<Link href="/nyhetslanseringer">Nyhetslanseringer</Link>
 										</li>
@@ -107,7 +107,7 @@
 									</ul>
 								</div>
 								<div class="font-light md:col-span-6 col-span-full flex md:justify-center">
-									<ul class="*:mb-8 last:mb-0">
+									<ul class="*:mb-8">
 										<li><Link href="/om-siden">Om siden</Link></li>
 										<li><Link href="/bidra">Bidra</Link></li>
 										<li><Link href="/kontakt">Kontakt</Link></li>
