@@ -12,6 +12,7 @@ export async function GET({ url, cookies }) {
 		const { sessionCookie, sessionToken } = await createSession(token);
 		await addUserToQueue(sessionToken);
 		cookies.set('session-token', sessionToken.getValue(), {
+			domain: 'winmonopolet.no',
 			path: '/',
 			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
 			maxAge: 31536000
