@@ -13,7 +13,8 @@ export async function GET({ url, cookies }) {
 		await addUserToQueue(sessionToken);
 		cookies.set('session-token', sessionToken.getValue(), {
 			path: '/',
-			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+			expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+			maxAge: 31536000
 		});
 		cookies.set('session-data', sessionCookie, { path: '/' });
 	} catch (error) {
