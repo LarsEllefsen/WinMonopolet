@@ -75,7 +75,10 @@ export class UserQueueConsumer {
 		const { userProducts, totalUserProducts } =
 			await this.untappdService.getUserProducts(user, numSavedUserProducts);
 
-		await this.userProductRepository.insert(userProducts);
+		await this.userProductRepository.upsert(userProducts, {
+			conflictPaths: ['untappdId', 'userId'],
+			skipUpdateIfNoValuesChanged: true,
+		});
 
 		return {
 			processName: 'Save untappd checkins',
