@@ -20,7 +20,7 @@
 
 	$: searchResult = onSearch(searchInput);
 	$: {
-		if (searchIsActive && searchInputElement !== undefined) {
+		if (searchIsActive && searchInputElement) {
 			searchInputElement.focus();
 		}
 	}
