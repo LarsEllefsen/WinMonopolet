@@ -11,6 +11,24 @@ const getStockLevelFromText = (mainText: string) => {
 	return Number(numberOfItemsInStock?.[0]);
 };
 
+const getAvailabilityText = (product: BaseProduct) => {
+	if (
+		!product.availability ||
+		(!product.availability.deliveryAvailability &&
+			!product.availability.storeAvailability)
+	)
+		return null;
+	if (product.availability.storeAvailability) {
+		return product.availability.storeAvailability.mainText;
+	}
+
+	if (product.availability.deliveryAvailability) {
+		return product.availability.deliveryAvailability.mainText;
+	}
+
+	return null;
+};
+
 export const mapToVinmonopoletProduct = (
 	vinmonopoletProductDTO: BaseProduct,
 ) => {
@@ -33,6 +51,8 @@ export const mapToVinmonopoletProduct = (
 	vinmonopoletProduct.added_date = undefined;
 	vinmonopoletProduct.active = 1;
 	vinmonopoletProduct.untappd = undefined;
+	vinmonopoletProduct.buyable = vinmonopoletProductDTO.buyable;
+	vinmonopoletProduct.availablity = getAvailabilityText(vinmonopoletProductDTO);
 	return vinmonopoletProduct;
 };
 

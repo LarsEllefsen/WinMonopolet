@@ -6,7 +6,6 @@ import {
 	getAllStores,
 	getProducts,
 	getProductsByStore,
-	getProduct,
 } from 'vinmonopolet-ts';
 import { VinmonopoletProductWithStockLevel } from './vinmonopolet.interface';
 import {
@@ -22,13 +21,13 @@ import { Store } from '@modules/stores/entities/stores.entity';
 export class VinmonopoletService {
 	private readonly logger = new Logger(VinmonopoletService.name);
 
-	async getAllProducts(facet: FacetValue) {
+	async getAllProducts(facets: FacetValue[]) {
 		const allProducts: VinmonopoletProduct[] = [];
 		let currentPage = 1;
 		let totalPages = 2;
 		while (currentPage <= totalPages) {
 			const { pagination, products } = await getProducts({
-				facet,
+				facets,
 				page: currentPage,
 			});
 
@@ -97,9 +96,5 @@ export class VinmonopoletService {
 			);
 		}
 		return store;
-	}
-
-	async healthcheck() {
-		return getProduct('14962801');
 	}
 }

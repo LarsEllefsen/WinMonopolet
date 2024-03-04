@@ -7,11 +7,13 @@ import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
 import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
 import { UntappdModule } from '@modules/untappd/untappd.module';
 import { WordlistModule } from '@modules/wordlist/wordlist.module';
+import { UpcomingProduct } from './entities/upcomingProduct.entity';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([VinmonopoletProduct]),
 		TypeOrmModule.forFeature([UntappdProduct]),
+		TypeOrmModule.forFeature([UpcomingProduct]),
 		UntappdModule,
 		VinmonopoletModule,
 		WordlistModule,
@@ -20,9 +22,4 @@ import { WordlistModule } from '@modules/wordlist/wordlist.module';
 	providers: [ProductsService],
 	exports: [ProductsService],
 })
-export class ProductsModule implements OnModuleInit {
-	constructor(private readonly service: ProductsService) {}
-	async onModuleInit() {
-		// await this.service.asd();
-	}
-}
+export class ProductsModule {}

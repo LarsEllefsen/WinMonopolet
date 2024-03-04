@@ -4,6 +4,8 @@ import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProd
 import { Store } from '@modules/stores/entities/stores.entity';
 import { Stock } from '@modules/stores/entities/stock.entity';
 import {
+	AddBuyableColumn,
+	CreateUpcomingProductsTable,
 	addUserAvatarHDColumn,
 	createStockTable,
 	createStoresTable,
@@ -18,6 +20,7 @@ import { User } from '@modules/users/entities/user.entity';
 import { Word } from '@modules/wordlist/entities/word';
 import { UserProduct } from '@modules/users/entities/userProduct.entity';
 import { UserWishlistProduct } from '@modules/users/entities/userWishlistProduct.entity';
+import { UpcomingProduct } from '@modules/products/entities/upcomingProduct.entity';
 
 export default TypeOrmModule.forRootAsync({
 	useFactory: () => ({
@@ -34,6 +37,7 @@ export default TypeOrmModule.forRootAsync({
 			User,
 			UserProduct,
 			UserWishlistProduct,
+			UpcomingProduct,
 		],
 		migrations: [
 			createStoresTable,
@@ -45,6 +49,8 @@ export default TypeOrmModule.forRootAsync({
 			createUserProductsTable,
 			addUserAvatarHDColumn,
 			createUserWishlistProductsTable,
+			CreateUpcomingProductsTable,
+			AddBuyableColumn,
 		],
 		migrationsRun: true,
 		synchronize: false,

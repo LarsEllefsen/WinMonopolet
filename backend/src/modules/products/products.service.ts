@@ -13,6 +13,8 @@ import { Word } from '@modules/wordlist/entities/word';
 import { ProductsStatCollector } from './productsStatCollector';
 import { Store } from '@modules/stores/entities/stores.entity';
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
+import { Facet } from 'vinmonopolet-ts';
+import { UpcomingProduct } from './entities/upcomingProduct.entity';
 
 type ProcessVinmonopoletProducts = {
 	apiLimitReached: boolean;
@@ -25,12 +27,17 @@ export class ProductsService {
 		private vinmonopoletProductRepository: Repository<VinmonopoletProduct>,
 		@InjectRepository(UntappdProduct)
 		private untappdProductRepository: Repository<UntappdProduct>,
+		@InjectRepository(UpcomingProduct)
+		private upcomingProductRepository: Repository<UpcomingProduct>,
 		private vinmonopoletService: VinmonopoletService,
 		private untappdService: UntappdService,
 		private wordlistService: WordlistService,
 	) {}
 
 	private readonly logger = new Logger(ProductsService.name);
+	private readonly DATE_PATTERN = new RegExp(
+		'^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[012])[.](19|20)[0-9]{2}$',
+	);
 
 	findAll(hasUntappdProduct?: boolean, active?: boolean) {
 		const whereActiveClause =
@@ -201,6 +208,35 @@ export class ProductsService {
 		return allProducts;
 	}
 
+	async findAndSaveAnyUpcomingProducts() {
+		const statCollector = new ProductsStatCollector();
+		let getUntappdProducts = true;
+
+		for (const productCategory of productCategories) {
+			const allUpcomingProducts = await this.vinmonopoletService.getAllProducts(
+				[productCategory, Facet.UpcomingProduct],
+			);
+
+			const processResults: ProcessVinmonopoletProducts =
+				await this.processVinmonopoletProducts(
+					allUpcomingProducts,
+					getUntappdProducts,
+					statCollector,
+				);
+			if (getUntappdProducts) {
+				getUntappdProducts = !processResults.apiLimitReached;
+			}
+
+			for (const product of allUpcomingProducts) {
+				await this.saveUpcomingProduct(product);
+			}
+		}
+
+		this.logger.log(
+			`Found ${statCollector.getNumSavedProducts()} upcoming products`,
+		);
+	}
+
 	/**
 	 * Gets all products from Vinmonopolet and either updates the existing product or inserts it as a new product.
 	 * If the product does not have a corresponding untappd product it tries to find a matching product and insert it into the database.
@@ -213,9 +249,9 @@ export class ProductsService {
 			this.logger.debug(
 				`Fetching all products in category: ${productCategory}`,
 			);
-			const products = await this.vinmonopoletService.getAllProducts(
+			const products = await this.vinmonopoletService.getAllProducts([
 				productCategory,
-			);
+			]);
 			const processProductsResult: ProcessVinmonopoletProducts =
 				await this.processVinmonopoletProducts(
 					products,
@@ -274,13 +310,12 @@ export class ProductsService {
 		} satisfies ProcessVinmonopoletProducts;
 	}
 
-	private async vinmonopoletProductHasUntappdProduct(
+	private vinmonopoletProductHasUntappdProduct(
 		vinmonopoletProduct: VinmonopoletProduct,
 	) {
-		const asd = await this.untappdProductRepository.exist({
+		return this.untappdProductRepository.exist({
 			where: { vmp_id: vinmonopoletProduct.vmp_id },
 		});
-		return asd;
 	}
 
 	private async tryToFindMatchingUntappdProduct(
@@ -319,6 +354,13 @@ export class ProductsService {
 		}
 	}
 
+	private async saveUpcomingProduct(product: VinmonopoletProduct) {
+		const upcomingProduct = new UpcomingProduct();
+		upcomingProduct.vinmonopoletProduct = product;
+		upcomingProduct.releaseDate = this.getReleaseDate(product);
+		await this.upcomingProductRepository.save(upcomingProduct);
+	}
+
 	private getProductById(vmp_id: string) {
 		return this.vinmonopoletProductRepository.findOneBy({
 			vmp_id: vmp_id,
@@ -348,5 +390,35 @@ export class ProductsService {
 				);
 			throw error;
 		}
+	}
+
+	private getReleaseDate(product: VinmonopoletProduct): Date {
+		if (!product.availablity) {
+			throw Error(
+				`Unable to ascertain release date for product ${product.vmp_id}: missing availability information`,
+			);
+		}
+
+		const splitAvailabilityText = product.availablity.split('Lanseres');
+		if (splitAvailabilityText.length > 3) {
+			throw Error(
+				`Unable to ascertain release date for product ${product.vmp_id}: ambigious date in availability information (Found '${product.availablity}')`,
+			);
+		}
+
+		const dateString =
+			splitAvailabilityText.length == 2
+				? splitAvailabilityText[1].trim()
+				: splitAvailabilityText[0].trim();
+
+		if (!this.DATE_PATTERN.test(dateString)) {
+			throw Error(
+				`Unable to ascertain release date for product ${product.vmp_id}: date string ${dateString} is not a valid date (Expected dd.mm.yyyy)`,
+			);
+		}
+
+		const [day, month, year] = dateString.split('.');
+
+		return new Date(Number(year), Number(month) - 1, Number(day));
 	}
 }

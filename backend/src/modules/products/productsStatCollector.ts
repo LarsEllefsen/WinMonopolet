@@ -26,6 +26,10 @@ export class ProductsStatCollector {
 		this.didNotFindUntappdProduct.push(product);
 	}
 
+	getNumSavedProducts() {
+		return this.numSavedProducts;
+	}
+
 	printStatistics() {
 		this.logger.log(`
 Successfully saved ${this.numSavedProducts} products.

@@ -7,6 +7,8 @@ import { UntappdProduct } from '@modules/products/entities/untappdProduct.entity
 import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProduct.entity';
 import { Stock } from '@modules/stores/entities/stock.entity';
 import {
+	AddBuyableColumn,
+	CreateUpcomingProductsTable,
 	addUserAvatarHDColumn,
 	createStockTable,
 	createStoresTable,
@@ -35,6 +37,7 @@ import { UserWishlistProduct } from '@modules/users/entities/userWishlistProduct
 import { UserNotification } from '@modules/users/entities/userNotification.entity';
 import { MailModule } from '@modules/mail/mail.module';
 import { AdminModule } from '@modules/admin/admin.module';
+import { UpcomingProduct } from '@modules/products/entities/upcomingProduct.entity';
 
 @Module({
 	imports: [
@@ -58,6 +61,7 @@ import { AdminModule } from '@modules/admin/admin.module';
 				FavoriteStore,
 				UserWishlistProduct,
 				UserNotification,
+				UpcomingProduct,
 			],
 			synchronize: false,
 			migrationsRun: true,
@@ -73,6 +77,8 @@ import { AdminModule } from '@modules/admin/admin.module';
 				addUserAvatarHDColumn,
 				createUserWishlistProductsTable,
 				createUserNotificationTable,
+				CreateUpcomingProductsTable,
+				AddBuyableColumn,
 			],
 		}),
 		BullModule.forRoot({

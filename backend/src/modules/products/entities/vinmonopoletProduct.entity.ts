@@ -53,7 +53,12 @@ export class VinmonopoletProduct {
 	@Column()
 	active: number;
 
+	@Column()
+	buyable: boolean;
+
 	is_new: boolean;
+
+	availablity: string | null;
 
 	@OneToOne(
 		() => UntappdProduct,

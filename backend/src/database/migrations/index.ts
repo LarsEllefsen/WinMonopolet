@@ -9,3 +9,5 @@ export { CreateUserFavoritedStoresTable1697368602238 as createUserFavoritedStore
 export { AddUserAvatarHDColumn1701608036917 as addUserAvatarHDColumn } from './1701608036917-addUserAvatarHDColumn';
 export { CreateUserWishlistProductsTable1702410212830 as createUserWishlistProductsTable } from './1702410212830-createUserWishlistProductsTable';
 export { CreateUserNotificationTable1702587015936 as createUserNotificationTable } from './1702587015936-createUserNotificationTable';
+export { CreateUpcomingProductsTable1709573388797 as CreateUpcomingProductsTable } from './1709573388797-createUpcomingProductsTable';
+export { AddBuyableColumn1709574020072 as AddBuyableColumn } from './1709574020072-addBuyableColumn';
