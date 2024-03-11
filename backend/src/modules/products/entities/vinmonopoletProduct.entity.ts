@@ -51,7 +51,7 @@ export class VinmonopoletProduct {
 	last_updated?: Date;
 
 	@Column()
-	active: number;
+	active: boolean;
 
 	@Column()
 	buyable: boolean;
@@ -75,7 +75,7 @@ export class VinmonopoletProduct {
 	@BeforeInsert()
 	@BeforeUpdate()
 	setUpdated() {
-		this.active = 1;
+		this.active = true;
 		this.last_updated = new Date();
 	}
 

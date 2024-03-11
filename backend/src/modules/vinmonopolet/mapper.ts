@@ -49,7 +49,7 @@ export const mapToVinmonopoletProduct = (
 		vinmonopoletProductDTO.volume.formattedValue;
 	vinmonopoletProduct.last_updated = undefined;
 	vinmonopoletProduct.added_date = undefined;
-	vinmonopoletProduct.active = 1;
+	vinmonopoletProduct.active = true;
 	vinmonopoletProduct.untappd = undefined;
 	vinmonopoletProduct.buyable = vinmonopoletProductDTO.buyable;
 	vinmonopoletProduct.availablity = getAvailabilityText(vinmonopoletProductDTO);

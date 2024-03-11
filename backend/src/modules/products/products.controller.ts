@@ -25,14 +25,13 @@ export class ProductsController {
 		type: VinmonopoletProduct,
 		isArray: true,
 	})
-	async findAll(
+	async getProducts(
 		@Query('query') query?: string,
 		@Query('hasUntappdProduct', ParseOptionalBoolPipe)
 		hasUntappdProduct?: boolean,
 		@Query('active', ParseOptionalBoolPipe) active?: boolean,
 	) {
-		if (query) return this.productsService.search(query, hasUntappdProduct);
-		return this.productsService.findAll(hasUntappdProduct, active);
+		return this.productsService.getProducts(query, hasUntappdProduct, active);
 	}
 
 	@Post(':vmp_id/untappd')

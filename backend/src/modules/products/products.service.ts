@@ -39,9 +39,15 @@ export class ProductsService {
 		'^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[012])[.](19|20)[0-9]{2}$',
 	);
 
-	findAll(hasUntappdProduct?: boolean, active?: boolean) {
-		const whereActiveClause =
-			active !== undefined ? { active: active ? 1 : 0 } : undefined;
+	async getProducts(
+		query?: string,
+		hasUntappdProduct?: boolean,
+		active?: boolean,
+	): Promise<VinmonopoletProduct[]> {
+		if (query)
+			return this.searchProductsByQuery(query, hasUntappdProduct, active);
+
+		const whereActiveClause = active !== undefined ? { active } : undefined;
 
 		const whereHasUntappdProductClause =
 			hasUntappdProduct !== undefined
@@ -52,27 +58,25 @@ export class ProductsService {
 				  }
 				: undefined;
 
-		if (hasUntappdProduct !== undefined) {
-			return this.vinmonopoletProductRepository.find({
-				relations: { untappd: true },
-				where: {
-					...whereHasUntappdProductClause,
-					...whereActiveClause,
-				},
-			});
-		}
-
 		return this.vinmonopoletProductRepository.find({
 			relations: { untappd: true },
-			where: whereActiveClause,
+			where: {
+				...whereHasUntappdProductClause,
+				...whereActiveClause,
+			},
 		});
 	}
 
-	async search(query: string, hasUntappdProduct?: boolean) {
+	private async searchProductsByQuery(
+		query: string,
+		hasUntappdProduct?: boolean,
+		active?: boolean,
+	) {
 		const products = await this.vinmonopoletProductRepository.find({
-			where: {
-				vmp_name: Like(`%${query}%`),
-			},
+			where: [
+				{ vmp_name: Like(`%${query}%`), active },
+				{ vmp_id: Like(`%${query}%`), active },
+			],
 			relations: {
 				untappd: true,
 			},
@@ -108,7 +112,7 @@ export class ProductsService {
 			const untappdProductsToUpdate =
 				await this.vinmonopoletProductRepository.find({
 					order: { untappd: { last_updated: 'asc' } },
-					where: { untappd: { vmp_id: Not(IsNull()) }, active: 1 },
+					where: { untappd: { vmp_id: Not(IsNull()) }, active: true },
 				});
 
 			for (const product of untappdProductsToUpdate) {
