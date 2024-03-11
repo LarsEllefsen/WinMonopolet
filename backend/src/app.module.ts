@@ -8,6 +8,7 @@ import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProd
 import { Stock } from '@modules/stores/entities/stock.entity';
 import {
 	AddBuyableColumn,
+	AlterUpcomingProductsTable,
 	CreateUpcomingProductsTable,
 	addUserAvatarHDColumn,
 	createStockTable,
@@ -79,6 +80,7 @@ import { UpcomingProduct } from '@modules/products/entities/upcomingProduct.enti
 				createUserNotificationTable,
 				CreateUpcomingProductsTable,
 				AddBuyableColumn,
+				AlterUpcomingProductsTable,
 			],
 		}),
 		BullModule.forRoot({

@@ -11,3 +11,4 @@ export { CreateUserWishlistProductsTable1702410212830 as createUserWishlistProdu
 export { CreateUserNotificationTable1702587015936 as createUserNotificationTable } from './1702587015936-createUserNotificationTable';
 export { CreateUpcomingProductsTable1709573388797 as CreateUpcomingProductsTable } from './1709573388797-createUpcomingProductsTable';
 export { AddBuyableColumn1709574020072 as AddBuyableColumn } from './1709574020072-addBuyableColumn';
+export { AlterUpcomingProductsTable1710176891891 as AlterUpcomingProductsTable } from './1710176891891-alterUpcomingProductsTable';

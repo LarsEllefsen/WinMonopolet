@@ -12,7 +12,7 @@ export class UpcomingProduct {
 	@JoinColumn({ name: 'vmp_id' })
 	vinmonopoletProduct: VinmonopoletProduct;
 
-	@Column({ nullable: false, type: 'timestamptz', name: 'release_date' })
+	@Column({ nullable: false, type: 'date', name: 'release_date' })
 	@IsDateString()
 	releaseDate: Date;
 }
