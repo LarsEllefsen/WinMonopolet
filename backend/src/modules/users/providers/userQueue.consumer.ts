@@ -98,10 +98,9 @@ export class UserQueueConsumer {
 		const { wishlistProducts, totalWishlistProducts } =
 			await this.untappdService.getUserWishlist(user, 0);
 
-		await this.userWishlistProductRepository.upsert(wishlistProducts, {
-			conflictPaths: ['untappdId', 'userId'],
-			skipUpdateIfNoValuesChanged: true,
-		});
+		for (const wishlistProduct of wishlistProducts) {
+			await this.insertWishlistProduct(wishlistProduct);
+		}
 
 		if (numSavedUserWishlistedProducts > wishlistProducts.length) {
 			await this.deleteAnyRemovedWishlistProducts(wishlistProducts, user.id);
@@ -177,5 +176,20 @@ export class UserQueueConsumer {
 		if (user === null) throw new Error(`No user with id ${userId} exists.`);
 
 		return user;
+	}
+
+	private async insertWishlistProduct(wishlistProduct: UserWishlistProduct) {
+		try {
+			await this.userWishlistProductRepository.upsert(wishlistProduct, {
+				conflictPaths: ['untappdId', 'userId'],
+				skipUpdateIfNoValuesChanged: true,
+			});
+		} catch (error) {
+			this.logger.error(
+				`Unable to save wishlist product ${wishlistProduct.untappdId} for user ${wishlistProduct.userId}`,
+				error?.message ?? error,
+				error?.stack,
+			);
+		}
 	}
 }
