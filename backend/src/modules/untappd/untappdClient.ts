@@ -50,6 +50,7 @@ export class UntappdClient {
 	}
 
 	private readonly logger = new Logger(UntappdClient.name);
+	private readonly DELAY = 2000;
 
 	search(query: string) {
 		const queryParams = {
@@ -66,7 +67,7 @@ export class UntappdClient {
 					searchResult: response.body.response,
 				})),
 			)
-			.pipe(delay(2000));
+			.pipe(delay(this.DELAY));
 	}
 
 	getBeerInfo(untappd_id: string) {
@@ -79,7 +80,7 @@ export class UntappdClient {
 					plainToInstance(GetBeerInfoResponseDTO, body.response),
 				),
 			)
-			.pipe(delay(2000));
+			.pipe(delay(this.DELAY));
 	}
 
 	getUserInfo(accessToken: string) {
@@ -103,7 +104,7 @@ export class UntappdClient {
 					remainingApiCalls,
 				})),
 			)
-			.pipe(delay(2000));
+			.pipe(delay(this.DELAY));
 	}
 
 	getUserWishlistProducts(offset: number, accessToken: string) {
@@ -125,7 +126,7 @@ export class UntappdClient {
 					remainingApiCalls,
 				})),
 			)
-			.pipe(delay(2000));
+			.pipe(delay(this.DELAY));
 	}
 
 	GET<T>(endpoint: string, params: Record<string, string | number | boolean>) {
