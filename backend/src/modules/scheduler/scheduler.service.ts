@@ -31,9 +31,9 @@ export class SchedulerService {
 
 	/**
 	 * Will run at (UTC):
-	 * 02:00 (UTC) - 3:00 Europe/Oslo
+	 * 04:00 (UTC) - 5:00 Europe/Oslo
 	 */
-	@Cron(CronExpression.EVERY_DAY_AT_2AM)
+	@Cron(CronExpression.EVERY_DAY_AT_4AM)
 	private async updateUntappdProductsWithScoreOfZero() {
 		if (process.env.NODE_ENV === 'development') return;
 		this.logger.debug(
