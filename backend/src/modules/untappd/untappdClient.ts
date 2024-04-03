@@ -50,7 +50,7 @@ export class UntappdClient {
 	}
 
 	private readonly logger = new Logger(UntappdClient.name);
-	private readonly DELAY = 2000;
+	private readonly DELAY = 2500;
 
 	search(query: string) {
 		const queryParams = {
