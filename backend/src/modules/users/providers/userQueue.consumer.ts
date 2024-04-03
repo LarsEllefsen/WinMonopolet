@@ -75,10 +75,9 @@ export class UserQueueConsumer {
 		const { userProducts, totalUserProducts } =
 			await this.untappdService.getUserProducts(user, numSavedUserProducts);
 
-		await this.userProductRepository.upsert(userProducts, {
-			conflictPaths: ['untappdId', 'userId'],
-			skipUpdateIfNoValuesChanged: true,
-		});
+		for (const userProduct of userProducts) {
+			await this.insertUsertProduct(userProduct);
+		}
 
 		return {
 			processName: 'Save untappd checkins',
@@ -187,6 +186,21 @@ export class UserQueueConsumer {
 		} catch (error) {
 			this.logger.error(
 				`Unable to save wishlist product ${wishlistProduct.untappdId} for user ${wishlistProduct.userId}`,
+				error?.message ?? error,
+				error?.stack,
+			);
+		}
+	}
+
+	private async insertUsertProduct(userProduct: UserProduct) {
+		try {
+			await this.userProductRepository.upsert(userProduct, {
+				conflictPaths: ['untappdId', 'userId'],
+				skipUpdateIfNoValuesChanged: true,
+			});
+		} catch (error) {
+			this.logger.error(
+				`Unable to save user product ${userProduct.untappdId} for user ${userProduct.userId}`,
 				error?.message ?? error,
 				error?.stack,
 			);
