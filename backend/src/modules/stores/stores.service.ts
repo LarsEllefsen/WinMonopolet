@@ -114,7 +114,6 @@ export class StoresService {
 				this.logger.error(`Failed to update stock: ${error?.message}`);
 			}
 		}
-		await this.setActiveBeersBasedOnStock();
 	}
 
 	async updateAvailableStores() {
