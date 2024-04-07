@@ -11,7 +11,7 @@
 			<p>
 				Alle er velkommene til å bidra! Siden er open source og kan finnes på <a
 					class="text-link"
-					href="https://www.github.com"
+					href="https://github.com/LarsEllefsen/WinMonopolet"
 					target="_blank"
 				>
 					Github
