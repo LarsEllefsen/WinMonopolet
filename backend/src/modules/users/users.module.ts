@@ -1,37 +1,30 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
-import { UntappdModule } from '@modules/untappd/untappd.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { UserContextProvider } from './providers/userContext.provider';
-import { BullModule } from '@nestjs/bull';
-import { UserQueueConsumer } from './providers/userQueue.consumer';
-import { UserProduct } from './entities/userProduct.entity';
 import {
 	FIVE_MINUTES_IN_MILLISECONDS,
 	ONE_HOUR_IN_MILLISECONDS,
 } from '@common/constants';
+import { DatabaseModule } from '@modules/database/database.module';
 import { StoresModule } from '@modules/stores/stores.module';
-import { FavoriteStore } from './entities/favoriteStore.entity';
-import { UserWishlistProduct } from './entities/userWishlistProduct.entity';
-import { UserNotification } from './entities/userNotification.entity';
-
+import { UntappdModule } from '@modules/untappd/untappd.module';
+import { BullModule } from '@nestjs/bull';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { UserContextProvider } from './providers/userContext.provider';
+import { UserQueueConsumer } from './providers/userQueue.consumer';
+import { FavoriteStoreRepository } from './repositories/favoriteStore.repository';
+import { UserRepository } from './repositories/user.repository';
+import { UserNotificationRepository } from './repositories/userNotification.repository';
+import { UserProductsRepository } from './repositories/userProducts.repository';
+import { UserWishlistRepository } from './repositories/userWishlist.repository';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 @Module({
 	imports: [
+		DatabaseModule,
 		JwtModule,
 		ConfigModule,
 		UntappdModule,
 		StoresModule,
-		TypeOrmModule.forFeature([
-			User,
-			UserProduct,
-			FavoriteStore,
-			UserWishlistProduct,
-			UserNotification,
-		]),
 		BullModule.registerQueue({
 			name: 'user',
 			defaultJobOptions: {
@@ -43,7 +36,16 @@ import { UserNotification } from './entities/userNotification.entity';
 		}),
 	],
 	controllers: [UsersController],
-	providers: [UsersService, UserContextProvider, UserQueueConsumer],
+	providers: [
+		UsersService,
+		UserContextProvider,
+		UserQueueConsumer,
+		UserRepository,
+		FavoriteStoreRepository,
+		UserProductsRepository,
+		UserWishlistRepository,
+		UserNotificationRepository,
+	],
 	exports: [UsersService],
 })
 export class UsersModule {

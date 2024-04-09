@@ -1,22 +1,22 @@
+import { AuthGuard } from '@common/guards/auth.guard';
 import {
-	Controller,
-	Get,
-	UseGuards,
-	Post,
-	UseInterceptors,
+	BadRequestException,
+	Body,
 	ClassSerializerInterceptor,
+	Controller,
+	Delete,
+	Get,
+	Inject,
 	NotFoundException,
 	Param,
-	Delete,
-	Body,
-	Inject,
-	BadRequestException,
+	Post,
+	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { AuthGuard } from '@common/guards/auth.guard';
 import { AddFavoriteStoreDTO } from './dto/addFavoriteStoreDTO';
-import { UserContext } from './providers/userContext.provider';
 import { AddUserNotificationDTO } from './dto/addUserNotificationDTO';
+import { UserContext } from './providers/userContext.provider';
+import { UsersService } from './users.service';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)

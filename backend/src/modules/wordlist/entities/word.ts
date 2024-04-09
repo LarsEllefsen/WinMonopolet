@@ -1,10 +1,9 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity('wordlist')
 export class Word {
-	@PrimaryGeneratedColumn()
 	id: number;
-
-	@Column()
 	value: string;
+
+	constructor(id: number, value: string) {
+		this.id = id;
+		this.value = value;
+	}
 }

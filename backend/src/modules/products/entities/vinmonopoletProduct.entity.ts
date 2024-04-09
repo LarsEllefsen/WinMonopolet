@@ -1,92 +1,85 @@
-import {
-	AfterLoad,
-	BeforeInsert,
-	BeforeUpdate,
-	Column,
-	CreateDateColumn,
-	Entity,
-	OneToOne,
-	PrimaryColumn,
-} from 'typeorm';
 import { UntappdProduct } from './untappdProduct.entity';
-import { IsDateString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 import { TWO_WEEKS_IN_MILLISECONDS } from '@common/constants';
 
-@Entity('vinmonopolet_products')
 export class VinmonopoletProduct {
-	@ApiProperty({ description: 'The unique product ID', example: '14962702' })
-	@PrimaryColumn({ name: 'vmp_id' })
+	[k: string]: any;
+
 	vmp_id: string;
 
-	@Column()
 	vmp_name: string;
 
-	@Column()
 	vmp_url: string;
 
-	@Column({ type: 'float' })
 	price: number;
 
-	@Column()
 	category: string;
 
-	@Column({ type: 'text', nullable: true })
 	sub_category: string | null;
 
-	@Column()
 	product_selection: string;
 
-	@Column()
 	container_size: string;
 
-	@Column()
 	country: string;
 
-	@CreateDateColumn()
-	@IsDateString()
 	added_date?: Date;
 
-	@Column({ nullable: false, type: 'timestamptz' })
 	last_updated?: Date;
 
-	@Column()
 	active: boolean;
 
-	@Column()
 	buyable: boolean;
 
 	is_new: boolean;
 
 	availablity: string | null;
 
-	@OneToOne(
-		() => UntappdProduct,
-		(untappdProduct) => untappdProduct.vinmonopolet_product,
-		{ cascade: ['insert', 'update', 'remove'], eager: true },
-	)
-	untappd?: UntappdProduct | null;
+	untappd?: UntappdProduct;
 
-	withUntappdProduct(untappdProduct: UntappdProduct) {
+	constructor(
+		productId: string,
+		productName: string,
+		vinmonopoletURL: string,
+		price: number,
+		category: string,
+		subCategory: string | null,
+		productSelection: string,
+		containerSize: string,
+		country: string,
+		addedDate: Date | undefined,
+		lastUpdated: Date | undefined,
+		active: boolean,
+		buyable: boolean,
+		availability: string | null,
+		untappdProduct: UntappdProduct | undefined,
+	) {
+		this.vmp_id = productId;
+		this.vmp_name = productName;
+		this.vmp_url = vinmonopoletURL;
+		this.price = price;
+		this.category = category;
+		this.sub_category = subCategory;
+		this.product_selection = productSelection;
+		this.container_size = containerSize;
+		this.country = country;
+		this.added_date = addedDate;
+		this.last_updated = lastUpdated;
+		this.active = active;
+		this.buyable = buyable;
+		this.availablity = availability;
 		this.untappd = untappdProduct;
-		return this;
+		if (addedDate) {
+			this.is_new = this.setIsNew();
+		}
 	}
 
-	@BeforeInsert()
-	@BeforeUpdate()
-	setUpdated() {
-		this.active = true;
-		this.last_updated = new Date();
-	}
-
-	@AfterLoad()
-	setIsNew() {
+	private setIsNew() {
 		const today = new Date();
 		const added = this.added_date as Date;
 		if (today.getTime() - added.getTime() <= TWO_WEEKS_IN_MILLISECONDS) {
-			this.is_new = true;
+			return true;
 		} else {
-			this.is_new = false;
+			return false;
 		}
 	}
 }

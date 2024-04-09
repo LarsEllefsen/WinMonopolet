@@ -1,27 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { Word } from './entities/word';
-import { InjectRepository } from '@nestjs/typeorm';
+import { WordlistRepository } from '@modules/wordlist/repositories/wordlist.repository';
 
 @Injectable()
 export class WordlistService {
-	constructor(
-		@InjectRepository(Word)
-		private wordlistRepository: Repository<Word>,
-	) {}
+	constructor(private wordlistRepository: WordlistRepository) {}
 
 	async deleteWord(id: number) {
-		return this.wordlistRepository.delete({ id });
+		return this.wordlistRepository.deleteWordById(id);
 	}
 
 	async getAllWords() {
-		const words = await this.wordlistRepository.find();
-		return words;
+		return this.wordlistRepository.getAllWords();
 	}
 
 	async addWord(wordToAdd: string) {
-		const word = new Word();
-		word.value = wordToAdd;
-		this.wordlistRepository.save(word);
+		this.wordlistRepository.saveWord(wordToAdd);
 	}
 }

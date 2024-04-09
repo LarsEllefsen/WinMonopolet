@@ -1,25 +1,17 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { ProductsController } from './products.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UntappdProduct } from './entities/untappdProduct.entity';
-import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
-import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
+import { DatabaseModule } from '@modules/database/database.module';
 import { UntappdModule } from '@modules/untappd/untappd.module';
+import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
 import { WordlistModule } from '@modules/wordlist/wordlist.module';
-import { UpcomingProduct } from './entities/upcomingProduct.entity';
+import { Module } from '@nestjs/common';
+import { ProductsController } from './products.controller';
+import { ProductsService } from './products.service';
+import { ProductsRepository } from './repositories/products.repository';
+import { UpcomingProductRepository } from './repositories/upcomingProduct.repository';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([VinmonopoletProduct]),
-		TypeOrmModule.forFeature([UntappdProduct]),
-		TypeOrmModule.forFeature([UpcomingProduct]),
-		UntappdModule,
-		VinmonopoletModule,
-		WordlistModule,
-	],
+	imports: [UntappdModule, VinmonopoletModule, WordlistModule, DatabaseModule],
 	controllers: [ProductsController],
-	providers: [ProductsService],
+	providers: [ProductsService, ProductsRepository, UpcomingProductRepository],
 	exports: [ProductsService],
 })
 export class ProductsModule {}

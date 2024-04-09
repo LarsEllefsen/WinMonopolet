@@ -32,28 +32,23 @@ const getAvailabilityText = (product: BaseProduct) => {
 export const mapToVinmonopoletProduct = (
 	vinmonopoletProductDTO: BaseProduct,
 ) => {
-	const vinmonopoletProduct = new VinmonopoletProduct();
-	vinmonopoletProduct.vmp_id = vinmonopoletProductDTO.code;
-	vinmonopoletProduct.vmp_name = vinmonopoletProductDTO.name;
-	vinmonopoletProduct.vmp_url = vinmonopoletProductDTO.url;
-	vinmonopoletProduct.category = vinmonopoletProductDTO.mainCategory
-		.name as string;
-	vinmonopoletProduct.sub_category =
-		vinmonopoletProductDTO.mainSubCategory.name;
-	vinmonopoletProduct.country = vinmonopoletProductDTO.mainCountry
-		.name as string;
-	vinmonopoletProduct.product_selection =
-		vinmonopoletProductDTO.productSelection;
-	vinmonopoletProduct.price = vinmonopoletProductDTO.price;
-	vinmonopoletProduct.container_size =
-		vinmonopoletProductDTO.volume.formattedValue;
-	vinmonopoletProduct.last_updated = undefined;
-	vinmonopoletProduct.added_date = undefined;
-	vinmonopoletProduct.active = true;
-	vinmonopoletProduct.untappd = undefined;
-	vinmonopoletProduct.buyable = vinmonopoletProductDTO.buyable;
-	vinmonopoletProduct.availablity = getAvailabilityText(vinmonopoletProductDTO);
-	return vinmonopoletProduct;
+	return new VinmonopoletProduct(
+		vinmonopoletProductDTO.code,
+		vinmonopoletProductDTO.name,
+		vinmonopoletProductDTO.url,
+		vinmonopoletProductDTO.price,
+		vinmonopoletProductDTO.mainCategory.name as string,
+		vinmonopoletProductDTO.mainSubCategory.name ?? null,
+		vinmonopoletProductDTO.productSelection,
+		vinmonopoletProductDTO.volume.formattedValue,
+		vinmonopoletProductDTO.mainCountry.name as string,
+		undefined,
+		undefined,
+		true,
+		vinmonopoletProductDTO.buyable,
+		getAvailabilityText(vinmonopoletProductDTO),
+		undefined,
+	);
 };
 
 export const mapToVinmonopoletProductWithStockLevel = (
@@ -68,18 +63,17 @@ export const mapToVinmonopoletProductWithStockLevel = (
 };
 
 export const mapToStore = (storeDTO: PopulatedStore) => {
-	const store = new Store();
-	store.formatted_name = toSnakeCase(storeDTO.name);
-	store.store_id = storeDTO.storeNumber;
-	store.name = storeDTO.name;
-	store.lat = storeDTO.gpsCoordinates[0].toString();
-	store.lon = storeDTO.gpsCoordinates[1].toString();
-	store.city = storeDTO.postalCity;
-	store.address = storeDTO.postalAddress;
-	store.zip = storeDTO.postalZip;
-	store.category = getCategoryFromString(storeDTO.category);
-
-	return store;
+	return new Store(
+		storeDTO.storeNumber,
+		storeDTO.name,
+		toSnakeCase(storeDTO.name),
+		getCategoryFromString(storeDTO.category),
+		storeDTO.postalAddress,
+		storeDTO.postalCity,
+		storeDTO.postalZip,
+		storeDTO.gpsCoordinates[1].toString(),
+		storeDTO.gpsCoordinates[0].toString(),
+	);
 };
 
 const getCategoryFromString = (categoryString: string): number => {

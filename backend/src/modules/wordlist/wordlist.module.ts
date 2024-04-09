@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { WordlistService } from './wordlist.service';
 import { WordlistController } from './wordlist.controller';
-import { Word } from './entities/word';
+import { WordlistRepository } from '@modules/wordlist/repositories/wordlist.repository';
+import { DatabaseModule } from '@modules/database/database.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Word])],
+	imports: [DatabaseModule],
 	controllers: [WordlistController],
-	providers: [WordlistService],
+	providers: [WordlistService, WordlistRepository],
 	exports: [WordlistService],
 })
 export class WordlistModule {}

@@ -6,10 +6,10 @@ export const mapToStock = (
 	store: Store,
 	{ vinmonopoletProduct, stockLevel }: VinmonopoletProductWithStockLevel,
 ) => {
-	const stock = new Stock();
+	const stock = new Stock(store.store_id, vinmonopoletProduct, stockLevel);
 	stock.last_updated = new Date();
 	stock.product = vinmonopoletProduct;
-	stock.store = store;
+	stock.storeId = store.store_id;
 	stock.stock_level = stockLevel;
 
 	return stock;

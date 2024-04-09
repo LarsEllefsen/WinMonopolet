@@ -3,7 +3,7 @@ import { firstValueFrom, map } from 'rxjs';
 import { UntappdClient } from './untappdClient';
 import {
 	mapToUntappdProduct,
-	mapToUser,
+	mapToUntappdUser,
 	mapToUserProductsWithPagination,
 	mapToUserWishlistProductsWithTotalCount,
 } from './mapper';
@@ -97,7 +97,7 @@ export class UntappdService {
 
 	async getUserInfo(accessToken: string) {
 		return firstValueFrom(
-			this.untappdClient.getUserInfo(accessToken).pipe(map(mapToUser)),
+			this.untappdClient.getUserInfo(accessToken).pipe(map(mapToUntappdUser)),
 		);
 	}
 

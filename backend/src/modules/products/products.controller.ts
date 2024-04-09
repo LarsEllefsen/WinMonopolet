@@ -31,6 +31,7 @@ export class ProductsController {
 		hasUntappdProduct?: boolean,
 		@Query('active', ParseOptionalBoolPipe) active?: boolean,
 	) {
+		console.log({ query, hasUntappdProduct, active });
 		return this.productsService.getProducts(query, hasUntappdProduct, active);
 	}
 

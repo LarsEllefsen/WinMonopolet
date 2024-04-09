@@ -16,7 +16,6 @@ export class StoresController {
 	async getAllProductsByStore(
 		@Param('store_id') storeId: string,
 	): Promise<Stock[]> {
-		const store = await this.storeService.getStore(storeId);
-		return this.storeService.getStockForStore(store);
+		return this.storeService.getStockForStore(storeId);
 	}
 }

@@ -15,7 +15,7 @@ export class AdminService {
 	}
 
 	async getUserById(userId: string) {
-		const user = await this.usersService.getUserById(userId);
+		const user = await this.usersService.getUser(userId);
 		if (!user) {
 			throw new NotFoundException(`No user with id ${userId} found.`);
 		}

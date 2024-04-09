@@ -1,25 +1,20 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Stock } from './entities/stock.entity';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { StoresController } from './stores.controller';
-import { Store } from './entities/stores.entity';
 import { StoresService } from './stores.service';
-import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
-import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProduct.entity';
 import { ProductsModule } from '@modules/products/products.module';
+import { DatabaseModule } from '@modules/database/database.module';
+import { StoresRepository } from './repositories/stores.repository';
+import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([Store]),
-		TypeOrmModule.forFeature([Stock]),
-		TypeOrmModule.forFeature([VinmonopoletProduct]),
-		VinmonopoletModule,
-		ProductsModule,
-	],
+	imports: [DatabaseModule, ProductsModule, VinmonopoletModule],
 	controllers: [StoresController],
-	providers: [StoresService],
-	exports: [StoresService],
+	providers: [StoresService, StoresRepository],
+	exports: [StoresService, StoresRepository],
 })
-export class StoresModule {
+export class StoresModule implements OnModuleInit {
 	constructor(private service: StoresService) {}
+	async onModuleInit() {
+		//await this.service.testMe();
+	}
 }

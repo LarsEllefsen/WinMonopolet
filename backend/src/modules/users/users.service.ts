@@ -1,39 +1,32 @@
+import { APILimitReachedException } from '@exceptions/APILimitReachedException';
+import { StoresService } from '@modules/stores/stores.service';
+import { UntappdService } from '@modules/untappd/untappd.service';
+import { InjectQueue } from '@nestjs/bull';
 import {
 	Injectable,
 	InternalServerErrorException,
 	Logger,
 	NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UntappdService } from '@modules/untappd/untappd.service';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
-import { randomBytes } from 'crypto';
-import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { StoresService } from '@modules/stores/stores.service';
+import { randomBytes } from 'crypto';
 import { FavoriteStore } from './entities/favoriteStore.entity';
-import { Store } from '@modules/stores/entities/stores.entity';
-import { UserProduct } from './entities/userProduct.entity';
-import { APILimitReachedException } from '@exceptions/APILimitReachedException';
+import { User } from './entities/user.entity';
 import { UserNotification } from './entities/userNotification.entity';
-import { UserWishlistProduct } from './entities/userWishlistProduct.entity';
+import { FavoriteStoreRepository } from './repositories/favoriteStore.repository';
+import { UserRepository } from './repositories/user.repository';
+import { UserNotificationRepository } from './repositories/userNotification.repository';
+import { UserProductsRepository } from './repositories/userProducts.repository';
 
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectRepository(User)
-		private readonly userRepository: Repository<User>,
-		@InjectRepository(UserProduct)
-		private readonly userProductsRepository: Repository<UserProduct>,
-		@InjectRepository(FavoriteStore)
-		private readonly favoriteStoreRepository: Repository<FavoriteStore>,
-		@InjectRepository(UserNotification)
-		private readonly userNotificationRepository: Repository<UserNotification>,
-		@InjectRepository(UserWishlistProduct)
-		private readonly userwishlistRepository: Repository<UserWishlistProduct>,
 		private readonly untappdService: UntappdService,
 		private readonly storeService: StoresService,
+		private readonly userRepository: UserRepository,
+		private readonly favoriteStoreRepository: FavoriteStoreRepository,
+		private readonly userProductRepository: UserProductsRepository,
+		private readonly userNotificationRepository: UserNotificationRepository,
 		@InjectQueue('user') private userQueue: Queue,
 	) {}
 
@@ -49,9 +42,9 @@ export class UsersService {
 	async getAuthenticatedUser(userId: string | null, accessToken: string) {
 		let authenciatedUser: User | null = null;
 		if (userId) {
-			authenciatedUser = await this.getUserById(userId);
+			authenciatedUser = await this.userRepository.getUser(userId);
 		} else {
-			const users = await this.userRepository.find();
+			const users = await this.userRepository.getAllUsers();
 
 			authenciatedUser =
 				users.find((user) => user.accessToken === accessToken) ?? null;
@@ -72,17 +65,25 @@ export class UsersService {
 	 */
 	async saveUser(accessToken: string): Promise<User> {
 		try {
-			const retrievedUser = await this.getUntappdUser(accessToken);
-			const existingUser = await this.getUserById(retrievedUser.id);
+			const untappdUser = await this.untappdService.getUserInfo(accessToken);
+			const existingUser = await this.userRepository.getUser(untappdUser.id);
 
 			if (existingUser) {
-				await this.saveUpdatedUser(existingUser, retrievedUser, accessToken);
+				existingUser.accessToken = accessToken;
+				await this.userRepository.updateUser(existingUser);
 			} else {
-				await this.saveNewUser(retrievedUser, accessToken);
+				const newUser = new User(
+					untappdUser.id,
+					untappdUser.userName,
+					untappdUser.userAvatar,
+					untappdUser.userAvatarHD,
+					untappdUser.firstName,
+					accessToken,
+					randomBytes(16),
+				);
+				await this.userRepository.saveUser(newUser);
 			}
-			const savedUser = await this.userRepository.findOneBy({
-				id: retrievedUser.id,
-			});
+			const savedUser = await this.userRepository.getUser(untappdUser.id);
 			if (savedUser === null)
 				throw new InternalServerErrorException(
 					'Something went wrong saving user',
@@ -91,7 +92,7 @@ export class UsersService {
 			return savedUser;
 		} catch (error) {
 			if (error instanceof APILimitReachedException) {
-				this.logger.debug(
+				this.logger.log(
 					`User has reached their api limit, trying to return cached user based on accessToken.`,
 				);
 				return this.getAuthenticatedUser(null, accessToken);
@@ -110,48 +111,46 @@ export class UsersService {
 		});
 	}
 
-	getUserById(userId: string) {
-		return this.userRepository.findOne({
-			where: { id: userId },
-		});
+	async getUser(userId: string) {
+		return this.userRepository.getUser(userId);
 	}
 
 	getAllUsers() {
-		return this.userRepository.find();
+		return this.userRepository.getAllUsers();
 	}
 
 	async addFavoriteStore(userId: string, storeId: string) {
-		const user = await this.getUserById(userId);
+		const user = await this.userRepository.getUser(userId);
 		if (user === null)
 			throw new NotFoundException(`No user with id ${userId} found`);
 		const store = await this.storeService.getStore(storeId);
 
-		await this.saveFavoriteStore(user, store);
+		const newFavoriteStore = new FavoriteStore(user.id, store.store_id);
+		await this.favoriteStoreRepository.saveFavoriteStore(newFavoriteStore);
 	}
 
 	async removeFavoriteStore(userId: string, storeId: string) {
-		const user = await this.getUserById(userId);
+		const user = await this.userRepository.getUser(userId);
 		if (user === null)
 			throw new NotFoundException(`No user with id ${userId} found`);
 
-		const store = await this.favoriteStoreRepository.findOne({
-			where: { store_id: storeId, userId: user.id },
-		});
+		const store = await this.favoriteStoreRepository.getFavoriteStore(
+			userId,
+			storeId,
+		);
 		if (store === null)
 			throw new NotFoundException(
 				`User has no favorited store with id ${storeId}`,
 			);
-		await this.deleteFavoriteStore(store);
+		await this.favoriteStoreRepository.deleteFavoriteStore(userId, storeId);
 	}
 
 	getFavoriteStores(userId: string) {
-		return this.favoriteStoreRepository.find({
-			where: { userId },
-		});
+		return this.favoriteStoreRepository.getAllFavoriteStoresForUser(userId);
 	}
 
 	getUserProducts(userId: string) {
-		return this.userProductsRepository.findBy({ userId });
+		return this.userProductRepository.getUserProducts(userId);
 	}
 
 	async addUserNotification(
@@ -159,25 +158,19 @@ export class UsersService {
 		email: string,
 		notificationType: string,
 	) {
-		const user = await this.getUserById(userId);
+		const user = await this.userRepository.getUser(userId);
 		if (user === null) {
 			throw new NotFoundException(`No user with id ${userId} found`);
 		}
 
-		await this.userNotificationRepository.upsert(
-			this.userNotificationRepository.create({
-				email,
-				userId,
-				notificationType,
-			}),
-			{ skipUpdateIfNoValuesChanged: true, conflictPaths: ['userId'] },
+		await this.userNotificationRepository.saveNotification(
+			new UserNotification(userId, email, notificationType),
 		);
 	}
 
 	async getUserNotification(userId: string) {
-		const userNotification = await this.userNotificationRepository.findOneBy({
-			userId,
-		});
+		const userNotification =
+			await this.userNotificationRepository.getUserNotification(userId);
 		if (userNotification == null) {
 			throw new NotFoundException(`User ${userId} has no notifications`);
 		}
@@ -186,57 +179,11 @@ export class UsersService {
 	}
 
 	async deleteUser(userId: string) {
-		const user = await this.getUserById(userId);
+		const user = await this.userRepository.getUser(userId);
 		if (user === null) {
 			throw new NotFoundException(`No user with id ${userId} found`);
 		}
-		await this.userProductsRepository.delete({ userId });
-		await this.favoriteStoreRepository.delete({ userId });
-		await this.userwishlistRepository.delete({ userId });
-		await this.userRepository.remove(user);
+		await this.userRepository.deleteUser(userId);
 		this.logger.log(`Successfully deleted user ${userId}`);
-	}
-
-	private saveNewUser(retrievedUntappdUser: User, accessToken: string) {
-		const newUser = this.userRepository.create({
-			id: retrievedUntappdUser.id,
-			userName: retrievedUntappdUser.userName,
-			userAvatar: retrievedUntappdUser.userAvatar,
-			userAvatarHD: retrievedUntappdUser.userAvatarHD,
-			firstName: retrievedUntappdUser.firstName,
-			accessToken: accessToken,
-			salt: randomBytes(16),
-		});
-		return this.userRepository.insert(newUser);
-	}
-
-	private saveUpdatedUser(
-		existingUser: User,
-		retrievedUntappdUser: User,
-		accessToken: string,
-	) {
-		existingUser.accessToken = accessToken;
-		existingUser.userAvatar = retrievedUntappdUser.userAvatar;
-		existingUser.userAvatarHD = retrievedUntappdUser.userAvatarHD;
-		existingUser.firstName = retrievedUntappdUser.firstName;
-		return this.userRepository.upsert(existingUser, ['id']);
-	}
-
-	private getUntappdUser(accessToken: string) {
-		return this.untappdService.getUserInfo(accessToken);
-	}
-
-	private saveFavoriteStore(user: User, store: Store) {
-		const newFavoriteStore = this.favoriteStoreRepository.create({
-			user,
-			store,
-			userId: user.id,
-			store_id: store.store_id,
-		});
-		return this.favoriteStoreRepository.save(newFavoriteStore);
-	}
-
-	private deleteFavoriteStore(favoriteStore: FavoriteStore) {
-		return this.favoriteStoreRepository.remove(favoriteStore);
 	}
 }

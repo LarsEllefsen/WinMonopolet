@@ -1,15 +1,15 @@
 import { Process, Processor } from '@nestjs/bull';
 import { UntappdService } from '@modules/untappd/untappd.service';
 import { Job } from 'bull';
-import { InjectRepository } from '@nestjs/typeorm';
 import { UserProduct } from '../entities/userProduct.entity';
-import { Not, In, Repository } from 'typeorm';
 import { Logger } from '@nestjs/common';
-import { UsersService } from '../users.service';
 import { User } from '../entities/user.entity';
 import { UserWishlistProduct } from '../entities/userWishlistProduct.entity';
+import { UserProductsRepository } from '../repositories/userProducts.repository';
+import { UserWishlistRepository } from '../repositories/userWishlist.repository';
+import { UserRepository } from '../repositories/user.repository';
 
-type UserJobData = {
+export type UserJobData = {
 	userId: string;
 };
 
@@ -29,12 +29,10 @@ type JobResult = {
 @Processor('user')
 export class UserQueueConsumer {
 	constructor(
-		@InjectRepository(UserProduct)
-		private readonly userProductRepository: Repository<UserProduct>,
-		@InjectRepository(UserWishlistProduct)
-		private readonly userWishlistProductRepository: Repository<UserWishlistProduct>,
+		private readonly userProductsRepository: UserProductsRepository,
+		private readonly userWishlistRepository: UserWishlistRepository,
 		private readonly untappdService: UntappdService,
-		private readonly userService: UsersService,
+		private readonly userRepository: UserRepository,
 	) {}
 
 	private readonly logger = new Logger(UserQueueConsumer.name);
@@ -68,15 +66,14 @@ export class UserQueueConsumer {
 	}
 
 	private async saveUserProductsFromUntappd(user: User) {
-		const numSavedUserProducts = await this.userProductRepository.countBy({
-			userId: user.id,
-		});
+		const numSavedUserProducts =
+			await this.userProductsRepository.getNumberOfUserProducts(user.id);
 
 		const { userProducts, totalUserProducts } =
 			await this.untappdService.getUserProducts(user, numSavedUserProducts);
 
 		for (const userProduct of userProducts) {
-			await this.insertUsertProduct(userProduct);
+			await this.insertUserProduct(userProduct);
 		}
 
 		return {
@@ -90,9 +87,9 @@ export class UserQueueConsumer {
 
 	private async saveUserWishlistProductsFromUntappd(user: User) {
 		const numSavedUserWishlistedProducts =
-			await this.userWishlistProductRepository.countBy({
-				userId: user.id,
-			});
+			await this.userWishlistRepository.getNumberOfUserWishlistProducts(
+				user.id,
+			);
 
 		const { wishlistProducts, totalWishlistProducts } =
 			await this.untappdService.getUserWishlist(user, 0);
@@ -116,14 +113,26 @@ export class UserQueueConsumer {
 	}
 
 	private async deleteAnyRemovedWishlistProducts(
-		products: UserWishlistProduct[],
+		fetchedWishlistProducts: UserWishlistProduct[],
 		userId: string,
 	) {
-		const productsToRemove = await this.userWishlistProductRepository.findBy({
-			untappdId: Not(In(products.map((product) => product.untappdId))),
-			userId,
-		});
-		await this.userWishlistProductRepository.remove(productsToRemove);
+		const allSavedUserWishlistProducts =
+			await this.userWishlistRepository.getUserWishlistProducts(userId);
+
+		//Get all currently saved items that were not among the fetched products, these are removed by the user
+		const productsToRemove = allSavedUserWishlistProducts.filter(
+			(savedProduct) =>
+				!fetchedWishlistProducts.some(
+					(fetchedProduct) =>
+						fetchedProduct.untappdId === savedProduct.untappdId,
+				),
+		);
+		for (const productToRemove of productsToRemove) {
+			await this.userWishlistRepository.deleteWishlistProduct(
+				productToRemove.userId,
+				productToRemove.untappdId,
+			);
+		}
 		this.logger.log(
 			`Removed ${productsToRemove.length} wishlist products from user ${userId}`,
 		);
@@ -171,7 +180,7 @@ export class UserQueueConsumer {
 	}
 
 	private async getUser(userId: string) {
-		const user = await this.userService.getUserById(userId);
+		const user = await this.userRepository.getUser(userId);
 		if (user === null) throw new Error(`No user with id ${userId} exists.`);
 
 		return user;
@@ -179,10 +188,7 @@ export class UserQueueConsumer {
 
 	private async insertWishlistProduct(wishlistProduct: UserWishlistProduct) {
 		try {
-			await this.userWishlistProductRepository.upsert(wishlistProduct, {
-				conflictPaths: ['untappdId', 'userId'],
-				skipUpdateIfNoValuesChanged: true,
-			});
+			await this.userWishlistRepository.saveWishlistProduct(wishlistProduct);
 		} catch (error) {
 			this.logger.error(
 				`Unable to save wishlist product ${wishlistProduct.untappdId} for user ${wishlistProduct.userId}`,
@@ -192,12 +198,9 @@ export class UserQueueConsumer {
 		}
 	}
 
-	private async insertUsertProduct(userProduct: UserProduct) {
+	private async insertUserProduct(userProduct: UserProduct) {
 		try {
-			await this.userProductRepository.upsert(userProduct, {
-				conflictPaths: ['untappdId', 'userId'],
-				skipUpdateIfNoValuesChanged: true,
-			});
+			await this.userProductsRepository.saveUserProduct(userProduct);
 		} catch (error) {
 			this.logger.error(
 				`Unable to save user product ${userProduct.untappdId} for user ${userProduct.userId}`,

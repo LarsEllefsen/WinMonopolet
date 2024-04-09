@@ -1,20 +1,20 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { VinmonopoletService } from '@modules/vinmonopolet/vinmonopolet.service';
-import { IsNull, Like, Not, Repository } from 'typeorm';
-import { UntappdProduct } from './entities/untappdProduct.entity';
-import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
-import { UntappdService } from '@modules/untappd/untappd.service';
-import { APILimitReachedException } from '@exceptions/APILimitReachedException';
-import { WordlistService } from '@modules/wordlist/wordlist.service';
 import { productCategories } from '@common/constants';
-import { Word } from '@modules/wordlist/entities/word';
-import { ProductsStatCollector } from './productsStatCollector';
+import { APILimitReachedException } from '@exceptions/APILimitReachedException';
 import { Store } from '@modules/stores/entities/stores.entity';
+import { UntappdService } from '@modules/untappd/untappd.service';
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
+import { VinmonopoletService } from '@modules/vinmonopolet/vinmonopolet.service';
+import { Word } from '@modules/wordlist/entities/word';
+import { WordlistService } from '@modules/wordlist/wordlist.service';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Facet } from 'vinmonopolet-ts';
+import { UntappdProduct } from './entities/untappdProduct.entity';
 import { UpcomingProduct } from './entities/upcomingProduct.entity';
+import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
+import { ProductsStatCollector } from './productsStatCollector';
+import { ProductsRepository } from './repositories/products.repository';
+import { UpcomingProductRepository } from './repositories/upcomingProduct.repository';
 
 type ProcessVinmonopoletProducts = {
 	apiLimitReached: boolean;
@@ -23,15 +23,11 @@ type ProcessVinmonopoletProducts = {
 @Injectable()
 export class ProductsService {
 	constructor(
-		@InjectRepository(VinmonopoletProduct)
-		private vinmonopoletProductRepository: Repository<VinmonopoletProduct>,
-		@InjectRepository(UntappdProduct)
-		private untappdProductRepository: Repository<UntappdProduct>,
-		@InjectRepository(UpcomingProduct)
-		private upcomingProductRepository: Repository<UpcomingProduct>,
 		private vinmonopoletService: VinmonopoletService,
 		private untappdService: UntappdService,
 		private wordlistService: WordlistService,
+		private productsRepository: ProductsRepository,
+		private upcomingProductRepository: UpcomingProductRepository,
 	) {}
 
 	private readonly logger = new Logger(ProductsService.name);
@@ -44,57 +40,16 @@ export class ProductsService {
 		hasUntappdProduct?: boolean,
 		active?: boolean,
 	): Promise<VinmonopoletProduct[]> {
-		if (query)
-			return this.searchProductsByQuery(query, hasUntappdProduct, active);
-
-		const whereActiveClause = active !== undefined ? { active } : undefined;
-
-		const whereHasUntappdProductClause =
-			hasUntappdProduct !== undefined
-				? {
-						untappd: {
-							untappd_id: hasUntappdProduct === true ? Not(IsNull()) : IsNull(),
-						},
-				  }
-				: undefined;
-
-		return this.vinmonopoletProductRepository.find({
-			relations: { untappd: true },
-			where: {
-				...whereHasUntappdProductClause,
-				...whereActiveClause,
-			},
-		});
-	}
-
-	private async searchProductsByQuery(
-		query: string,
-		hasUntappdProduct?: boolean,
-		active?: boolean,
-	) {
-		const products = await this.vinmonopoletProductRepository.find({
-			where: [
-				{ vmp_name: Like(`%${query}%`), active },
-				{ vmp_id: Like(`%${query}%`), active },
-			],
-			relations: {
-				untappd: true,
-			},
-		});
-
-		if (hasUntappdProduct === undefined) return products;
-		return products.filter((product) =>
-			hasUntappdProduct ? product !== null : product === null,
+		return this.productsRepository.getProducts(
+			active,
+			hasUntappdProduct,
+			query,
 		);
 	}
 
 	async updateUntappdProductsWithScoreOfZero() {
 		const untappdProductsToUpdate =
-			await this.vinmonopoletProductRepository.findBy({
-				untappd: {
-					rating: 0.0,
-				},
-			});
+			await this.productsRepository.getProductsWithScoreOfZero();
 		this.logger.debug(
 			`Found ${untappdProductsToUpdate.length} products with a score of 0.0`,
 		);
@@ -110,10 +65,7 @@ export class ProductsService {
 		let numUpdatedProducts = 0;
 		try {
 			const untappdProductsToUpdate =
-				await this.vinmonopoletProductRepository.find({
-					order: { untappd: { last_updated: 'asc' } },
-					where: { untappd: { vmp_id: Not(IsNull()) }, active: true },
-				});
+				await this.productsRepository.getOldestUntappdProducts();
 
 			for (const product of untappdProductsToUpdate) {
 				await this.updateUntappdProduct(product);
@@ -139,7 +91,9 @@ export class ProductsService {
 		vmp_id: string,
 		untappd_id: string,
 	) {
-		const vinmonopoletProduct = await this.getProductById(vmp_id);
+		const vinmonopoletProduct = await this.productsRepository.getProductById(
+			vmp_id,
+		);
 		if (vinmonopoletProduct === null)
 			throw new NotFoundException(
 				`No vinmonopol product with id ${vmp_id} found.`,
@@ -148,13 +102,13 @@ export class ProductsService {
 			untappd_id,
 			vinmonopoletProduct.vmp_id,
 		);
-		await this.saveProduct(
-			vinmonopoletProduct.withUntappdProduct(untappdProduct),
-		);
+		await this.productsRepository.saveUntappdProduct(untappdProduct);
 	}
 
 	async deleteUntappdProduct(vmp_id: string) {
-		const vinmonopoletProduct = await this.getProductById(vmp_id);
+		const vinmonopoletProduct = await this.productsRepository.getProductById(
+			vmp_id,
+		);
 		if (vinmonopoletProduct === null)
 			throw new NotFoundException(
 				`No vinmonopol product with id ${vmp_id} found.`,
@@ -165,18 +119,14 @@ export class ProductsService {
 			);
 
 		try {
-			await this.vinmonopoletProductRepository
-				.createQueryBuilder()
-				.delete()
-				.from(UntappdProduct)
-				.where('untappd_id = :untappd_id', {
-					untappd_id: vinmonopoletProduct.untappd.untappd_id,
-				})
-				.execute();
+			await this.productsRepository.deleteUntappdProduct(
+				vinmonopoletProduct.untappd.untappd_id,
+			);
 		} catch (error) {
 			this.logger.error(
 				`Unable to delete untappd product associated with product ${vinmonopoletProduct.vmp_name} (${vinmonopoletProduct.vmp_id}`,
 			);
+			throw error;
 		}
 		this.logger.log(
 			`Successfully deleted untappd product ${vinmonopoletProduct.untappd.untappd_name} (${vinmonopoletProduct.untappd.untappd_id}) from product ${vinmonopoletProduct.vmp_name} (${vinmonopoletProduct.vmp_id})`,
@@ -190,7 +140,6 @@ export class ProductsService {
 	async getProductsByStore(store: Store) {
 		let allProducts = [] as VinmonopoletProductWithStockLevel[];
 		let getUntappdProducts = false;
-
 		for (const productCategory of productCategories) {
 			const products = await this.vinmonopoletService.getAllProductsByStore(
 				store.store_id,
@@ -232,7 +181,9 @@ export class ProductsService {
 			}
 
 			for (const product of allUpcomingProducts) {
-				await this.saveUpcomingProduct(product);
+				await this.upcomingProductRepository.saveUpcomingProduct(
+					new UpcomingProduct(product, this.getReleaseDate(product)),
+				);
 			}
 		}
 
@@ -291,7 +242,7 @@ export class ProductsService {
 					);
 
 					if (untappdProduct) {
-						await this.saveProduct(product.withUntappdProduct(untappdProduct));
+						await this.productsRepository.saveUntappdProduct(untappdProduct);
 						productsStatCollector?.addFoundUntappdProduct(product);
 					} else {
 						productsStatCollector?.addDidNotFindUntappdProduct(product);
@@ -317,9 +268,9 @@ export class ProductsService {
 	private vinmonopoletProductHasUntappdProduct(
 		vinmonopoletProduct: VinmonopoletProduct,
 	) {
-		return this.untappdProductRepository.exist({
-			where: { vmp_id: vinmonopoletProduct.vmp_id },
-		});
+		return this.productsRepository.vinmonopoletProductHasUntappdProduct(
+			vinmonopoletProduct.vmp_id,
+		);
 	}
 
 	private async tryToFindMatchingUntappdProduct(
@@ -345,7 +296,7 @@ export class ProductsService {
 
 	private async saveProduct(product: VinmonopoletProduct) {
 		try {
-			await this.vinmonopoletProductRepository.save(product);
+			await this.productsRepository.saveProduct(product);
 		} catch (error) {
 			this.logger.error(
 				`Failed to save product ${product.vmp_name} (${product.vmp_id}) ${
@@ -358,19 +309,6 @@ export class ProductsService {
 		}
 	}
 
-	private async saveUpcomingProduct(product: VinmonopoletProduct) {
-		const upcomingProduct = new UpcomingProduct();
-		upcomingProduct.vinmonopoletProduct = product;
-		upcomingProduct.releaseDate = this.getReleaseDate(product);
-		await this.upcomingProductRepository.save(upcomingProduct);
-	}
-
-	private getProductById(vmp_id: string) {
-		return this.vinmonopoletProductRepository.findOneBy({
-			vmp_id: vmp_id,
-		});
-	}
-
 	private async updateUntappdProduct(vinmonopoletProduct: VinmonopoletProduct) {
 		try {
 			if (!vinmonopoletProduct.untappd)
@@ -381,9 +319,7 @@ export class ProductsService {
 				vinmonopoletProduct.untappd.untappd_id,
 				vinmonopoletProduct.vmp_id,
 			);
-			await this.saveProduct(
-				vinmonopoletProduct.withUntappdProduct(updatedUntappdProduct),
-			);
+			await this.productsRepository.saveUntappdProduct(updatedUntappdProduct);
 		} catch (error) {
 			if (!(error instanceof APILimitReachedException))
 				this.logger.error(
