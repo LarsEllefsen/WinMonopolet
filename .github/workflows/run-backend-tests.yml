@@ -1,0 +1,31 @@
+name: run-backend-tests
+on: [push, pull_request]
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          dir: backend
+          cmd: install
+
+      - name: Run unit tests
+        uses: borales/actions-yarn@v4
+        with:
+          dir: backend
+          cmd: test:unit
+
+      - name: Run integration tests
+        uses: borales/actions-yarn@v4
+        with:
+          dir: backend
+          cmd: test:integration
