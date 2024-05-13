@@ -40,8 +40,8 @@ const mapToUserProducts = (
 	userId: string,
 ): UserProduct => {
 	return new UserProduct(
-		untappdUserProductDTO.beer.bid.toString(),
 		userId,
+		untappdUserProductDTO.beer.bid.toString(),
 		untappdUserProductDTO.user_auth_rating_score,
 	);
 };
@@ -51,8 +51,8 @@ const mapToUserWishlistProducts = (
 	userId: string,
 ): UserWishlistProduct => {
 	return new UserWishlistProduct(
-		untappdUserProductDTO.beer.bid.toString(),
 		userId,
+		untappdUserProductDTO.beer.bid.toString(),
 	);
 };
 
