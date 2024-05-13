@@ -180,6 +180,34 @@ const mockUpcomingUntappdProduct1: UntappdProduct = new UntappdProduct(
 	undefined,
 );
 
+const mockUpcomingUntappdProduct2: UntappdProduct = new UntappdProduct(
+	'upcoming_2',
+	'upcoming_2',
+	'Boring Bayer',
+	12,
+	5.0,
+	15,
+	'https://untappd.com/b/upcoming-hype/5',
+	'https://assets.untappd.com/site/beer_logos/test_sm.jpeg',
+	'Sour - Fruited',
+	'Test',
+	undefined,
+);
+
+const mockUpcomingUntappdProduct3: UntappdProduct = new UntappdProduct(
+	'upcoming_3',
+	'upcoming_3',
+	'Super Sour',
+	12,
+	5.0,
+	15,
+	'https://untappd.com/b/upcoming-hype/5',
+	'https://assets.untappd.com/site/beer_logos/test_sm.jpeg',
+	'Sour - Fruited',
+	'Test',
+	undefined,
+);
+
 export const mockVinmonopoletProduct5: VinmonopoletProduct =
 	new VinmonopoletProduct(
 		'5',
@@ -247,8 +275,45 @@ export const mockUpcomingVinmonopoletProduct2 = new VinmonopoletProduct(
 	false,
 	true,
 	'Lanseres 08.05.2024',
-	undefined,
+	mockUpcomingUntappdProduct2,
 );
+
+export const mockUpcomingVinmonopoletProduct3 = new VinmonopoletProduct(
+	'upcoming_3',
+	'Super Sour',
+	'https://www.vinmonopolet.no/Land/Norge/Test/p/3',
+	189.9,
+	'Øl',
+	null,
+	'Bestillingsutvalget',
+	'44cl',
+	'Norge',
+	undefined,
+	undefined,
+	false,
+	true,
+	'Lanseres 08.05.2024',
+	mockUpcomingUntappdProduct3,
+);
+
+export const mockUpcomingVinmonopoletProductWithoutUntappdProduct =
+	new VinmonopoletProduct(
+		'upcoming_no_untappd',
+		'Super Sour',
+		'https://www.vinmonopolet.no/Land/Norge/Test/p/3',
+		189.9,
+		'Øl',
+		null,
+		'Bestillingsutvalget',
+		'44cl',
+		'Norge',
+		undefined,
+		undefined,
+		false,
+		true,
+		'Lanseres 08.05.2024',
+		undefined,
+	);
 
 export const mockProducts = [
 	mockVinmonopoletProduct1,

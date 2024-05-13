@@ -11,7 +11,7 @@ import { mapRowToVinmonopoletProduct } from '@modules/database/mapper';
 
 export type UpcomingProductRow = {
 	vmp_id: VinmonopoletProduct;
-	release_date: string;
+	release_date: Date;
 };
 
 @Injectable()
@@ -37,10 +37,35 @@ export class UpcomingProductRepository {
 		SELECT *, true as active FROM upcoming_products ucp
 		INNER JOIN vinmonopolet_products vp ON vp.vmp_id = ucp.vmp_id
 		LEFT JOIN untappd_products up ON vp.vmp_id = up.vmp_id
-		WHERE ucp.release_date >= CURRENT_DATE
+		WHERE release_date >= CURRENT_DATE
 		`);
 
 		return upcomingProducts.rows.map(this.mapRowToUpcomingProduct);
+	}
+
+	async getUpcomingProductsInRelease(releaseDate: Date) {
+		const upcomingProducts = await this.connectionPool.query<
+			UpcomingProductRow & VinmonopoletProductRow & UntappdProductRow
+		>(
+			`
+		SELECT *, true as active FROM upcoming_products ucp
+		JOIN vinmonopolet_products vp ON vp.vmp_id = ucp.vmp_id
+		LEFT JOIN untappd_products up ON vp.vmp_id = up.vmp_id
+		WHERE release_date = $1
+		AND up.untappd_id IS NOT NULL
+		`,
+			[releaseDate],
+		);
+
+		return upcomingProducts.rows.map(this.mapRowToUpcomingProduct);
+	}
+
+	async getAllReleaseDates() {
+		const upcomingProducts = await this.connectionPool.query<{
+			release_date: Date;
+		}>(`SELECT DISTINCT release_date FROM upcoming_products`);
+
+		return upcomingProducts.rows.map((release) => release.release_date);
 	}
 
 	private mapRowToUpcomingProduct(

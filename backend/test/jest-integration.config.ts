@@ -13,6 +13,7 @@ module.exports = {
 		'^.+\\.(t|j)s$': 'ts-jest',
 	},
 	setupFilesAfterEnv: [
+		'jest-extended/all',
 		'<rootDir>/testSetup.ts',
 		'<rootDir>/initIntegrationTestEnvironment.ts',
 	],

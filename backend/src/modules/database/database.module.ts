@@ -1,6 +1,6 @@
 import { Inject, Module, OnModuleDestroy, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
 
 export const CONNECTION_POOL = 'CONNECTION_POOL';
 
@@ -23,7 +23,11 @@ const databaseProvider: Provider<Pool> = {
 	exports: [databaseProvider],
 })
 export class DatabaseModule implements OnModuleDestroy {
-	constructor(@Inject(CONNECTION_POOL) private readonly pool: Pool) {}
+	constructor(@Inject(CONNECTION_POOL) private readonly pool: Pool) {
+		types.setTypeParser(types.builtins.DATE, (val) => {
+			return new Date(val);
+		});
+	}
 	async onModuleDestroy() {
 		await this.pool.end();
 	}
