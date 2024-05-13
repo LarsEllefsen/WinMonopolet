@@ -38,7 +38,7 @@ export class UserProductsRepository {
 			count: number;
 		}>('SELECT COUNT(*) FROM user_products WHERE user_id = $1', [userId]);
 
-		return numberOfUserProducts.rows[0].count;
+		return Number(numberOfUserProducts.rows[0].count);
 	}
 
 	private mapToUserProduct(row: UserProductRow): UserProduct {
