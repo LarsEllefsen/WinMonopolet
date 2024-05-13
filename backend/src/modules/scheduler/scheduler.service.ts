@@ -24,8 +24,8 @@ export class SchedulerService {
 		if (process.env.NODE_ENV === 'development') return;
 		this.logger.log('Starting update routine');
 		await this.productService.insertOrUpdateAllVinmonopoletProducts();
-		//await this.storesService.updateAvailableStores();
-		//await this.storesService.updateStockForAllStores();
+		await this.storesService.updateAvailableStores();
+		await this.storesService.updateStockForAllStores();
 		await this.productService.updateOldestUntappdProducts();
 	}
 
