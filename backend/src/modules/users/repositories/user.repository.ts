@@ -79,6 +79,8 @@ export class UserRepository {
 			first_name = $4,
 			access_token = $5,
 			salt = $6
+		WHERE
+			id = $7
 			`,
 			[
 				encryptedUser.userName,
@@ -87,6 +89,7 @@ export class UserRepository {
 				encryptedUser.firstName,
 				encryptedUser.accessToken,
 				encryptedUser.salt.toString('base64'),
+				encryptedUser.id,
 			],
 		);
 	}

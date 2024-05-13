@@ -40,11 +40,12 @@ export class ProductsService {
 		hasUntappdProduct?: boolean,
 		active?: boolean,
 	): Promise<VinmonopoletProduct[]> {
-		return this.productsRepository.getProducts(
+		const products = await this.productsRepository.getProducts(
 			active,
 			hasUntappdProduct,
 			query,
 		);
+		return products;
 	}
 
 	async updateUntappdProductsWithScoreOfZero() {
