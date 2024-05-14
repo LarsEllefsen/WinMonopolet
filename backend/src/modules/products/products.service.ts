@@ -83,7 +83,7 @@ export class ProductsService {
 			}
 		} finally {
 			this.logger.log(
-				`Successfully updated ${numUpdatedProducts} untappd products`,
+				`updateOldestUntappdProducts: Successfully updated ${numUpdatedProducts} untappd products`,
 			);
 		}
 	}
@@ -244,7 +244,10 @@ export class ProductsService {
 
 					if (untappdProduct) {
 						await this.productsRepository.saveUntappdProduct(untappdProduct);
-						productsStatCollector?.addFoundUntappdProduct(product);
+						productsStatCollector?.addFoundUntappdProduct(
+							product,
+							untappdProduct,
+						);
 					} else {
 						productsStatCollector?.addDidNotFindUntappdProduct(product);
 					}

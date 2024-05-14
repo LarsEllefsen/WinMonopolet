@@ -36,7 +36,7 @@ export class SchedulerService {
 	@Cron(CronExpression.EVERY_DAY_AT_4AM)
 	private async updateUntappdProductsWithScoreOfZero() {
 		if (process.env.NODE_ENV === 'development') return;
-		this.logger.debug(
+		this.logger.log(
 			'Starting scheduled task: updateUntappdProductsWithScoreOfZero',
 		);
 		await this.productService.updateUntappdProductsWithScoreOfZero();
@@ -45,9 +45,7 @@ export class SchedulerService {
 	@Cron(CronExpression.EVERY_DAY_AT_10AM)
 	private async findAndSaveAnyUpcomingProducts() {
 		if (process.env.NODE_ENV === 'development') return;
-		this.logger.debug(
-			'Starting scheduled task: findAndSaveAnyUpcomingProducts',
-		);
+		this.logger.log('Starting scheduled task: findAndSaveAnyUpcomingProducts');
 		await this.productService.findAndSaveAnyUpcomingProducts();
 	}
 }

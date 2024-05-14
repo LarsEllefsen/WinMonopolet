@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
+import { UntappdProduct } from './entities/untappdProduct.entity';
 
 export class ProductsStatCollector {
 	private numSavedProducts: number;
@@ -18,7 +19,11 @@ export class ProductsStatCollector {
 		this.numSavedProducts++;
 	}
 
-	addFoundUntappdProduct(product: VinmonopoletProduct) {
+	addFoundUntappdProduct(
+		product: VinmonopoletProduct,
+		untappdProduct: UntappdProduct,
+	) {
+		product.untappd = untappdProduct;
 		this.foundUntappdProduct.push(product);
 	}
 
