@@ -1,3 +1,4 @@
+import { UntappdProduct } from '@modules/products/entities/untappdProduct.entity';
 import { ProductsStatCollector } from '@modules/products/productsStatCollector';
 import {
 	createMockUntappdProduct,
@@ -54,7 +55,10 @@ describe('ProductsStatCollector', () => {
 		});
 		foundNewUntappdProduct.forEach((x) => {
 			productsStatCollector.incrementSavedProducts();
-			productsStatCollector.addFoundUntappdProduct(x);
+			productsStatCollector.addFoundUntappdProduct(
+				x,
+				x.untappd as UntappdProduct,
+			);
 		});
 
 		productsStatCollector.printStatistics();
