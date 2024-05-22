@@ -1,5 +1,8 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { productCategories } from '@common/constants';
+import {
+	LOCALEDATESTRING_DD_MM_YYYY_OPTIONS,
+	productCategories,
+} from '@common/constants';
 import { APILimitReachedException } from '@exceptions/APILimitReachedException';
 import { Store } from '@modules/stores/entities/stores.entity';
 import { UntappdService } from '@modules/untappd/untappd.service';
@@ -191,6 +194,35 @@ export class ProductsService {
 		this.logger.log(
 			`Found ${statCollector.getNumSavedProducts()} upcoming products`,
 		);
+	}
+
+	async getUpcomingProducts() {
+		const allUpcomingProducts =
+			await this.upcomingProductRepository.getUpcomingProducts();
+
+		const upcomingReleaseDates = [
+			...new Set(
+				allUpcomingProducts.map((product) =>
+					product.releaseDate.toLocaleDateString(
+						'nb-NO',
+						LOCALEDATESTRING_DD_MM_YYYY_OPTIONS,
+					),
+				),
+			),
+		];
+		if (upcomingReleaseDates.length > 1) {
+			this.logger.warn(
+				`Found multiple release dates for the upcoming release. This might indicate that some products have the wrong release date. Found dates: ${upcomingReleaseDates}`,
+			);
+		}
+
+		const releaseDate = [...upcomingReleaseDates][0];
+		return {
+			releaseDate,
+			products: allUpcomingProducts.map(
+				(product) => product.vinmonopoletProduct,
+			),
+		};
 	}
 
 	/**

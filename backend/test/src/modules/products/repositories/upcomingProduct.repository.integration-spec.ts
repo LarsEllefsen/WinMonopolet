@@ -3,10 +3,13 @@ import { UpcomingProduct } from '@modules/products/entities/upcomingProduct.enti
 import { ProductsRepository } from '@modules/products/repositories/products.repository';
 import { UpcomingProductRepository } from '@modules/products/repositories/upcomingProduct.repository';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getDateWithoutTime } from '@utils/getDateWithoutTime';
 import { postgresClient } from 'test/initIntegrationTestEnvironment';
 import {
 	mockUpcomingVinmonopoletProduct1,
 	mockUpcomingVinmonopoletProduct2,
+	mockUpcomingVinmonopoletProduct3,
+	mockUpcomingVinmonopoletProductWithoutUntappdProduct,
 } from 'test/mocks/mockProducts';
 
 describe('upcomingProductRepository', () => {
@@ -148,6 +151,84 @@ describe('upcomingProductRepository', () => {
 			);
 			expect(compareReleaseDates(upcomingProducts[0].releaseDate, releaseDate))
 				.toBeTrue;
+		});
+	});
+
+	describe('getAllReleaseDates', () => {
+		it('should get all DISTINCT release dates', async () => {
+			const futureReleaseDate = getCurrentDatePlusDays(5);
+			const pastReleasedDate = getCurrentDatePlusDays(-5);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct1);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct2);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(
+					mockUpcomingVinmonopoletProduct1,
+					futureReleaseDate,
+				),
+			);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(mockUpcomingVinmonopoletProduct2, pastReleasedDate),
+			);
+
+			const releaseDates = await upcomingProductRepository.getAllReleaseDates();
+
+			const sortedReleaseDates = releaseDates.sort((a, b) => (a < b ? 1 : -1));
+			expect(sortedReleaseDates).toHaveLength(2);
+			expect(sortedReleaseDates[0]).toEqualDateIgnoringTime(futureReleaseDate);
+			expect(sortedReleaseDates[1]).toEqualDateIgnoringTime(pastReleasedDate);
+		});
+	});
+
+	describe('getProductsInRelease', () => {
+		it('should return all upcoming products with the given release date', async () => {
+			const release1 = new Date(2024, 10, 23);
+			const release2 = new Date(2023, 9, 10);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct1);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct2);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct3);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(mockUpcomingVinmonopoletProduct1, release1),
+			);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(mockUpcomingVinmonopoletProduct2, release1),
+			);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(mockUpcomingVinmonopoletProduct3, release2),
+			);
+
+			const release1Products =
+				await upcomingProductRepository.getUpcomingProductsInRelease(release1);
+			const release2Products =
+				await upcomingProductRepository.getUpcomingProductsInRelease(release2);
+
+			expect(release1Products).toHaveLength(2);
+			expect(release2Products).toHaveLength(1);
+		});
+
+		it('should only return products with an associated untappd product', async () => {
+			const release = new Date(2024, 10, 23);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct1);
+			await productRepository.saveProduct(
+				mockUpcomingVinmonopoletProductWithoutUntappdProduct,
+			);
+			await productRepository.saveProduct(mockUpcomingVinmonopoletProduct3);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(mockUpcomingVinmonopoletProduct1, release),
+			);
+			await upcomingProductRepository.saveUpcomingProduct(
+				new UpcomingProduct(
+					mockUpcomingVinmonopoletProductWithoutUntappdProduct,
+					release,
+				),
+			);
+
+			const releaseProducts =
+				await upcomingProductRepository.getUpcomingProductsInRelease(release);
+
+			expect(releaseProducts).toHaveLength(1);
+			expect(releaseProducts[0].vinmonopoletProduct.vmp_id).toBe(
+				mockUpcomingVinmonopoletProduct1.vmp_id,
+			);
 		});
 	});
 });

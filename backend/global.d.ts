@@ -13,12 +13,14 @@ declare global {
 			): T;
 			toMatchUser(expectedUser: User): T;
 			toMatchStock(expectedStock: Stock[]): T;
+			toEqualDateIgnoringTime(expectedTime: Date): T;
 		}
 		interface ExpectExtendMap {
 			toMatchProduct: MatcherFunction<[actualProduct: VinmonopoletProduct]>;
 			toBeWithinSecondsOfDate: MatcherFunction<[recievedDate: Date]>;
 			toMatchUser: MatcherFunction<[actualUser: User]>;
 			toMatchStock: MatcherFunction<[actualStock: Stock[]]>;
+			toEqualDateIgnoringTime: MatcherFunction<[recievedDate: Date]>;
 		}
 	}
 }

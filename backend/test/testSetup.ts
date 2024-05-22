@@ -1,4 +1,5 @@
 import toBeWithinSecondsOfDate from './utils/matchers/toBeWithinSecondsOfDate';
+import toEqualDateIgnoringTime from './utils/matchers/toEqualDateIgnoringTime';
 import toMatchProduct from './utils/matchers/toMatchProduct';
 import toMatchStock from './utils/matchers/toMatchStock';
 import toMatchUser from './utils/matchers/toMatchUser';
@@ -8,6 +9,7 @@ expect.extend({
 	toBeWithinSecondsOfDate,
 	toMatchUser,
 	toMatchStock,
+	toEqualDateIgnoringTime,
 });
 
 process.env.ACCESS_TOKEN_ENCRYPTION_KEY = 'MOCK_ACCESS_TOKEN';

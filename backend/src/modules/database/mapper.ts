@@ -27,7 +27,7 @@ export function mapRowToUntappdProduct(
 }
 
 export function mapRowToVinmonopoletProduct(
-	row: VinmonopoletProductRow & UntappdProductRow & { release_date?: string },
+	row: VinmonopoletProductRow & UntappdProductRow & { release_date?: Date },
 ) {
 	const vinmonopoletProduct = new VinmonopoletProduct(
 		row.vmp_id,
@@ -52,15 +52,14 @@ export function mapRowToVinmonopoletProduct(
 	return vinmonopoletProduct;
 }
 
-function mapReleaseDateToAvailabilityText(releaseDate: string) {
-	const date = new Date(releaseDate);
+function mapReleaseDateToAvailabilityText(releaseDate: Date) {
 	const options: Intl.DateTimeFormatOptions = {
 		day: '2-digit',
 		month: '2-digit',
 		year: 'numeric',
 	};
 
-	return `Lanseres ${date.toLocaleDateString('nb-NO', options)}`;
+	return `Lanseres ${releaseDate.toLocaleDateString('nb-NO', options)}`;
 }
 
 export function mapRowToStock(

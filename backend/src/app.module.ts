@@ -12,6 +12,7 @@ import { BullModule } from '@nestjs/bull';
 import { MailModule } from '@modules/mail/mail.module';
 import { AdminModule } from '@modules/admin/admin.module';
 import { DatabaseModule } from '@modules/database/database.module';
+import { ReleasesModule } from '@modules/releases/releases.module';
 
 @Module({
 	imports: [
@@ -32,6 +33,7 @@ import { DatabaseModule } from '@modules/database/database.module';
 		UsersModule,
 		MailModule,
 		AdminModule,
+		ReleasesModule,
 	],
 	providers: [SchedulerService],
 })
