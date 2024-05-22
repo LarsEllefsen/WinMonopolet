@@ -53,6 +53,7 @@ export class UpcomingProductRepository {
 		LEFT JOIN untappd_products up ON vp.vmp_id = up.vmp_id
 		WHERE release_date = $1
 		AND up.untappd_id IS NOT NULL
+		ORDER BY up.rating DESC
 		`,
 			[releaseDate],
 		);
