@@ -1,6 +1,5 @@
 import { GET } from '$lib/server/GET';
 import { getUserProducts } from '$lib/server/user/getUserProducts';
-import { fail } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { UserProduct } from '../../../types/product';
 import type { Stock } from '../../../types/stock';

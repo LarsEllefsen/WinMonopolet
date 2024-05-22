@@ -19,6 +19,7 @@ declare global {
 		interface PageData {
 			user: User;
 			stores: Store[];
+			releases: Releases;
 			isAuthenticated: boolean;
 		}
 		// interface Platform {}

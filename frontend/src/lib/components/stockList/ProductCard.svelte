@@ -74,10 +74,12 @@
 				<span class="lg:inline-block hidden">Volum:</span>
 				<span class="inline-block">{stock.product.container_size}</span>
 			</p>
-			<p class="lg:p-0 lg:border-0 border border-slate-500 rounded-full md:px-4 py-1 px-2">
-				<span class="lg:inline-block hidden">På lager:</span>
-				<span class="inline-block">{stock.stock_level} stk</span>
-			</p>
+			{#if stock.stock_level > 0}
+				<p class="lg:p-0 lg:border-0 border border-slate-500 rounded-full md:px-4 py-1 px-2">
+					<span class="lg:inline-block hidden">På lager:</span>
+					<span class="inline-block">{stock.stock_level} stk</span>
+				</p>
+			{/if}
 		</div>
 	</div>
 

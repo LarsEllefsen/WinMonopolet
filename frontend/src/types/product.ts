@@ -43,3 +43,8 @@ export enum ProductErrorType {
 	OUTDATED_RATING = 'OUTDATED_RATING',
 	OTHER = 'OTHER'
 }
+
+export type UpcomingProduct = {
+	releaseDate: string;
+	vinmonopoletProduct: VinmonopoletProduct;
+};

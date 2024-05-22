@@ -5,15 +5,18 @@
 	import { createFilters } from '$lib/components/productFilters/createFilters';
 	import StockList from '$lib/components/stockList/StockList.svelte';
 	import type { Filters } from '../../../types/filters';
-	import type { Store } from '../../../types/store';
 	import { beforeNavigate } from '$app/navigation';
 	import FilterIcon from 'virtual:icons/mingcute/filter-2-line';
+	import type { Stock } from '../../../types/stock';
+
+	export let stock: Stock[];
+	export let title: string;
 
 	let filterDialog: HTMLDialogElement | undefined;
 
 	let numProductsToShow = 20;
 
-	const cachedFilters = createFilters($page.data.stock);
+	const cachedFilters = createFilters(stock);
 
 	function updateFilters(updatedFilters: Filters) {
 		filters = { ...updatedFilters };
@@ -41,11 +44,7 @@
 		closeFilterDialog();
 	});
 
-	$: stock = $page.data.stock;
-	$: currentStore = $page.data.stores.find(
-		(store: Store) => store.store_id === $page.params.store_id
-	);
-	$: filters = createFilters($page.data.stock);
+	$: filters = createFilters(stock);
 	$: stockToShow = filterProducts(stock, filters).slice(0, numProductsToShow);
 </script>
 
@@ -53,7 +52,7 @@
 	<div class="grid grid-cols-12 lg:px-0 px-4">
 		<div class="lg:col-span-6 lg:col-start-5 col-span-full pb-4 bg-white">
 			<h1 class="text-4xl font-thin text-center bg-white">
-				{currentStore?.name}
+				{title}
 			</h1>
 		</div>
 		<div class="row-start-2 col-span-4 pr-6">
