@@ -39,7 +39,7 @@
 	"type": "module",
 	"dependencies": {
 		"@lucia-auth/oauth": "^1.2.1",
-		"@sveltejs/adapter-node": "^3.0.0",
+		"@sveltejs/adapter-node": "^3.0.3",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"autoprefixer": "^10.4.16",
 		"jsonwebtoken": "^9.0.1",
