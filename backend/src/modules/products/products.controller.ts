@@ -12,6 +12,9 @@ import { CreateUntappdProductFromIdDTO } from './dto/createUntappdProductFromIdD
 import { ParseOptionalBoolPipe } from '@common/pipes/parseOptionalBool.pipe';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
+import { ProductSortKey, SortDirection } from '@common/types/QueryParameters';
+import { ParseProductSortKey } from '@common/pipes/parseProductSortKey.pipe';
+import { ParseSortDirection } from '@common/pipes/parseSortDirection.pipe';
 
 @ApiTags('products')
 @Controller('products')
@@ -30,8 +33,25 @@ export class ProductsController {
 		@Query('hasUntappdProduct', ParseOptionalBoolPipe)
 		hasUntappdProduct?: boolean,
 		@Query('active', ParseOptionalBoolPipe) active?: boolean,
+		@Query('productCategories') categories?: string[],
+		@Query('subCategories') subCategories?: string[],
+		@Query('limit') limit?: number,
+		@Query('offset') offset?: number,
+		@Query('sortBy', ParseProductSortKey)
+		sortBy?: ProductSortKey,
+		@Query('sort', ParseSortDirection) sort?: SortDirection,
 	) {
-		return this.productsService.getProducts(query, hasUntappdProduct, active);
+		return this.productsService.getProducts(
+			query,
+			hasUntappdProduct,
+			active,
+			categories,
+			subCategories,
+			limit,
+			offset,
+			sortBy,
+			sort,
+		);
 	}
 
 	@Post(':vmp_id/untappd')

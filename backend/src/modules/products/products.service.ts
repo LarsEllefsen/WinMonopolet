@@ -10,7 +10,12 @@ import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmono
 import { VinmonopoletService } from '@modules/vinmonopolet/vinmonopolet.service';
 import { Word } from '@modules/wordlist/entities/word';
 import { WordlistService } from '@modules/wordlist/wordlist.service';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	Logger,
+	NotFoundException,
+} from '@nestjs/common';
 import { Facet } from 'vinmonopolet-ts';
 import { UntappdProduct } from './entities/untappdProduct.entity';
 import { UpcomingProduct } from './entities/upcomingProduct.entity';
@@ -18,6 +23,7 @@ import { VinmonopoletProduct } from './entities/vinmonopoletProduct.entity';
 import { ProductsStatCollector } from './productsStatCollector';
 import { ProductsRepository } from './repositories/products.repository';
 import { UpcomingProductRepository } from './repositories/upcomingProduct.repository';
+import { ProductSortKey, SortDirection } from '@common/types/QueryParameters';
 
 type ProcessVinmonopoletProducts = {
 	apiLimitReached: boolean;
@@ -42,11 +48,28 @@ export class ProductsService {
 		query?: string,
 		hasUntappdProduct?: boolean,
 		active?: boolean,
+		categories?: string[],
+		subCategories?: string[],
+		limit?: number,
+		offset?: number,
+		sortBy?: ProductSortKey,
+		sort?: SortDirection,
 	): Promise<VinmonopoletProduct[]> {
+		if (sortBy === ProductSortKey.rating && !hasUntappdProduct) {
+			throw new BadRequestException(
+				'Cannot sort by rating for products without untappd products',
+			);
+		}
 		const products = await this.productsRepository.getProducts(
 			active,
 			hasUntappdProduct,
 			query,
+			categories,
+			subCategories,
+			limit,
+			offset,
+			sortBy,
+			sort,
 		);
 		return products;
 	}

@@ -4,6 +4,7 @@ import { Pool } from 'pg';
 import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProduct.entity';
 import { UntappdProduct } from '@modules/products/entities/untappdProduct.entity';
 import { mapRowToVinmonopoletProduct } from '@modules/database/mapper';
+import { ProductSortKey, SortDirection } from '@common/types/QueryParameters';
 
 export type VinmonopoletProductRow = {
 	vmp_id: string;
@@ -77,11 +78,23 @@ export class ProductsRepository {
 		active?: boolean,
 		hasUntappdProduct?: boolean,
 		searchQuery?: string,
+		categories?: string[],
+		subCategories?: string[],
+		limit?: number,
+		offset?: number,
+		sortBy?: ProductSortKey,
+		sort?: SortDirection,
 	) {
 		const { query, parameters } = this.buildGetProductsQuery(
 			active,
 			hasUntappdProduct,
 			searchQuery,
+			categories,
+			subCategories,
+			limit,
+			offset,
+			sortBy,
+			sort,
 		);
 
 		const products = await this.connectionPool.query<
@@ -245,7 +258,22 @@ export class ProductsRepository {
 		active?: boolean,
 		hasUntappdProduct?: boolean,
 		searchQuery?: string,
+		categories?: string[],
+		subCategories?: string[],
+		limit?: number,
+		offset?: number,
+		sortBy = ProductSortKey.last_updated,
+		sort = SortDirection.DESC,
 	) {
+		const hasMultipleWhereClauses =
+			[
+				active,
+				hasUntappdProduct,
+				searchQuery,
+				categories,
+				subCategories,
+			].filter((x) => x !== undefined).length > 1;
+
 		const queryList = [
 			`SELECT 
 				vp.vmp_id,
@@ -284,7 +312,7 @@ export class ProductsRepository {
 
 		// Add WHERE clause for untappd product
 		if (hasUntappdProduct !== undefined) {
-			queryList.push(active !== undefined ? 'AND' : 'WHERE');
+			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
 			queryList.push(
 				hasUntappdProduct
 					? 'up.untappd_id IS NOT NULL'
@@ -293,13 +321,63 @@ export class ProductsRepository {
 		}
 
 		if (searchQuery !== undefined) {
-			if (hasUntappdProduct !== undefined || active !== undefined) {
-				queryList.push('AND');
-			} else {
-				queryList.push('WHERE');
-			}
-			queryList.push('vp.vmp_name LIKE $1');
+			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
+			queryList.push(`vp.vmp_name LIKE $1`);
 			parameters.push(`%${searchQuery}%`);
+		}
+
+		if (categories !== undefined) {
+			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
+			queryList.push(
+				`vp.category IN (${categories.map(
+					(_, i) => `$${i + (parameters.length + 1)}`,
+				)})`,
+			);
+			parameters.push(...categories);
+		}
+
+		if (subCategories !== undefined) {
+			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
+			queryList.push(
+				`vp.sub_category IN (${subCategories.map(
+					(_, i) => `$${i + (parameters.length + 1)}`,
+				)})`,
+			);
+			parameters.push(...subCategories);
+		}
+
+		switch (sortBy) {
+			case ProductSortKey.rating:
+				queryList.push('ORDER BY up.rating');
+				break;
+			case ProductSortKey.added_date:
+				queryList.push('ORDER BY vp.added_date');
+				break;
+			case ProductSortKey.last_updated:
+				queryList.push('ORDER BY vp.last_updated');
+				break;
+			case ProductSortKey.price:
+				queryList.push('ORDER BY vp.price');
+				break;
+		}
+
+		switch (sort) {
+			case SortDirection.ASC:
+				queryList.push('ASC');
+				break;
+			case SortDirection.DESC:
+				queryList.push('DESC');
+				break;
+		}
+
+		if (limit !== undefined) {
+			queryList.push(`LIMIT $${parameters.length + 1}`);
+			parameters.push(limit);
+		}
+
+		if (offset !== undefined) {
+			queryList.push(`OFFSET $${parameters.length + 1}`);
+			parameters.push(offset);
 		}
 
 		return {

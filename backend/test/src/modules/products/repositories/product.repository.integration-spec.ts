@@ -349,6 +349,124 @@ describe('productRepository', () => {
 			expect(retrievedProducts).toHaveLength(1);
 			expect(retrievedProducts[0]).toMatchProduct(mockVinmonopoletProduct2);
 		});
+
+		it('Can search for products by category', async () => {
+			await insertMockProducts();
+			const expectedProducts = mockProducts.filter((x) => x.category === 'Øl');
+
+			const retrievedProducts = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				['Øl'],
+			);
+
+			expect(retrievedProducts).toHaveLength(expectedProducts.length);
+			productsShouldMatch(retrievedProducts, expectedProducts, true);
+		});
+
+		it('Can search for products by multiple categories', async () => {
+			await insertMockProducts();
+			const expectedProducts = mockProducts.filter(
+				(x) => x.category === 'Øl' || x.category === 'Mjød',
+			);
+
+			const retrievedProducts = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				['Øl', 'Mjød'],
+			);
+
+			expect(retrievedProducts).toHaveLength(expectedProducts.length);
+			productsShouldMatch(retrievedProducts, expectedProducts, true);
+		});
+
+		it('Can search for products by sub category', async () => {
+			await insertMockProducts();
+			const expectedProducts = mockProducts.filter(
+				(x) => x.sub_category === 'Surøl',
+			);
+
+			const retrievedProducts = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				['Surøl'],
+			);
+
+			expect(retrievedProducts).toHaveLength(expectedProducts.length);
+			productsShouldMatch(retrievedProducts, expectedProducts, true);
+		});
+
+		it('Can search for products by multiple sub categories', async () => {
+			await insertMockProducts();
+			const expectedProducts = mockProducts.filter(
+				(x) => x.sub_category === 'Surøl' || x.sub_category === 'Lys Lager',
+			);
+
+			const retrievedProducts = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				['Surøl', 'Lys Lager'],
+			);
+
+			expect(retrievedProducts).toHaveLength(expectedProducts.length);
+			productsShouldMatch(retrievedProducts, expectedProducts, true);
+		});
+
+		it('Can search for products with all possible queries at once', async () => {
+			await insertMockProducts();
+			await storeRepository.updateStockForStore(
+				[MOCK_STOCK2],
+				mockStore1.store_id,
+			);
+			const expectedProducts = [mockVinmonopoletProduct2];
+
+			const retrievedProducts = await productRepository.getProducts(
+				true,
+				true,
+				'Double',
+				['Øl'],
+				['India Pale Ale'],
+			);
+
+			expect(retrievedProducts).toHaveLength(expectedProducts.length);
+			productsShouldMatch(retrievedProducts, expectedProducts, true);
+		});
+
+		it('Can search for products limit and offset', async () => {
+			await insertMockProducts();
+
+			const retrievedProducts1 = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				1,
+				0,
+			);
+
+			const retrievedProducts2 = await productRepository.getProducts(
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				1,
+				1,
+			);
+
+			expect(retrievedProducts1).toHaveLength(1);
+			expect(retrievedProducts2).toHaveLength(1);
+			expect(retrievedProducts1[0].vmp_id).not.toBe(
+				retrievedProducts2[0].vmp_id,
+			);
+		});
 	});
 
 	describe('getProductsWithUntappdScoreOf0', () => {
