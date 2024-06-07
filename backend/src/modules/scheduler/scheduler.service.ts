@@ -1,13 +1,16 @@
 import { ProductsService } from '@modules/products/products.service';
 import { StoresService } from '@modules/stores/stores.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class SchedulerService {
 	constructor(
 		private storesService: StoresService,
 		private productService: ProductsService,
+		@Inject(CACHE_MANAGER) private cache: Cache,
 	) {}
 
 	private readonly logger = new Logger(SchedulerService.name);
@@ -27,6 +30,7 @@ export class SchedulerService {
 		await this.storesService.updateAvailableStores();
 		await this.storesService.updateStockForAllStores();
 		await this.productService.updateOldestUntappdProducts();
+		await this.cache.reset();
 	}
 
 	/**

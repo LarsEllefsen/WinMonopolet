@@ -11,6 +11,7 @@ export const FIVE_MINUTES_IN_MILLISECONDS = 300000;
 export const ONE_WEEK_IN_MILLISECONDS = 604800000;
 export const TWO_WEEKS_IN_MILLISECONDS = 1209600000;
 export const THIRTY_SECONDS_IN_MILLISECONDS = 30000;
+export const SIX_HOURS_IN_MILLISECONDS = 21600000;
 export const LOCALEDATESTRING_DD_MM_YYYY_OPTIONS: Intl.DateTimeFormatOptions = {
 	year: 'numeric',
 	day: '2-digit',

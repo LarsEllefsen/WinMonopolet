@@ -13,18 +13,20 @@ import { MailModule } from '@modules/mail/mail.module';
 import { AdminModule } from '@modules/admin/admin.module';
 import { DatabaseModule } from '@modules/database/database.module';
 import { ReleasesModule } from '@modules/releases/releases.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
 		ScheduleModule.forRoot(),
-		DatabaseModule,
 		BullModule.forRoot({
 			redis: {
 				host: 'localhost',
 				port: 6379,
 			},
 		}),
+		CacheModule.register({ isGlobal: true }),
+		DatabaseModule,
 		StoresModule,
 		ProductsModule,
 		UntappdModule,
