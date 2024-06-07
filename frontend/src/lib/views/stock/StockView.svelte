@@ -8,9 +8,13 @@
 	import { beforeNavigate } from '$app/navigation';
 	import FilterIcon from 'virtual:icons/mingcute/filter-2-line';
 	import type { Stock } from '../../../types/stock';
+	import { createEventDispatcher } from 'svelte';
 
 	export let stock: Stock[];
 	export let title: string;
+	export let performFiltering = true;
+
+	const dispatch = createEventDispatcher();
 
 	let filterDialog: HTMLDialogElement | undefined;
 
@@ -20,6 +24,7 @@
 
 	function updateFilters(updatedFilters: Filters) {
 		filters = { ...updatedFilters };
+		dispatch('filtersChanged', filters);
 	}
 
 	function openFilterDialog() {
@@ -38,6 +43,7 @@
 
 	function resetFilters() {
 		filters = cachedFilters;
+		dispatch('filtersChanged', filters);
 	}
 
 	beforeNavigate(() => {
@@ -45,7 +51,9 @@
 	});
 
 	$: filters = createFilters(stock);
-	$: stockToShow = filterProducts(stock, filters).slice(0, numProductsToShow);
+	$: stockToShow = performFiltering
+		? filterProducts(stock, filters).slice(0, numProductsToShow)
+		: stock;
 </script>
 
 <div class="container mx-auto relative">
