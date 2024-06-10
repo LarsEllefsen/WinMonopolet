@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { getUniqueStringValues } from '$lib/utils/getUniqeValues';
+import { DEFAULT_ABV_RANGE, DEFAULT_PRICE_RANGE } from '../../constants';
 import type {
 	CreateFilters,
 	Filters,
@@ -73,9 +74,11 @@ const getAllAvailableSubCategoriesForCategory = (
 					'style'
 			  );
 
-	return allAvailableSubCategories.map((subCategory) =>
-		createNewSubCategory(subCategory, getAllAvailableStylesForSubCategory(products, subCategory))
-	);
+	return allAvailableSubCategories
+		.map((subCategory) =>
+			createNewSubCategory(subCategory, getAllAvailableStylesForSubCategory(products, subCategory))
+		)
+		.sort((a, b) => a.name.localeCompare(b.name));
 };
 
 const getProductCategories = (products: VinmonopoletProduct[]): ProductCategory[] => {
@@ -98,8 +101,8 @@ const getProductCategories = (products: VinmonopoletProduct[]): ProductCategory[
 export const createFiltersFromStock = (stock: Stock[]): Filters => {
 	const categories = getProductCategories(stock.map((stockEntry) => stockEntry.product));
 	return {
-		price: [0, 1000],
-		abv: [0, 20],
+		price: DEFAULT_PRICE_RANGE,
+		abv: DEFAULT_ABV_RANGE,
 		onlyShowNewArrivals: false,
 		removeUserCheckedInProducts: false,
 		productCategories: categories

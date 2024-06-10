@@ -19,6 +19,7 @@
 	import type { Filters } from '../../../../types/filters';
 	import Checkbox from '../../checkbox/Checkbox.svelte';
 	import Collapsible from '../../collapsible/Collapsible.svelte';
+	import { DEFAULT_ABV_RANGE, DEFAULT_PRICE_RANGE } from '../../../../constants';
 
 	export let filters: Filters;
 	export let onChange: (asd: Filters) => void;
@@ -35,8 +36,8 @@
 			label="Pris"
 			id="price-input"
 			suffix=" kr"
-			min={0}
-			max={1000}
+			min={DEFAULT_PRICE_RANGE[0]}
+			max={DEFAULT_PRICE_RANGE[1]}
 			on:stop={() => onChange(filters)}
 		/>
 	{/if}
@@ -46,8 +47,8 @@
 			label="Alkohol"
 			id="abv-input"
 			suffix="%"
-			min={0}
-			max={20}
+			min={DEFAULT_ABV_RANGE[0]}
+			max={DEFAULT_ABV_RANGE[1]}
 			on:stop={() => onChange(filters)}
 		/>
 	{/if}
