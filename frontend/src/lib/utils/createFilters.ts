@@ -2,9 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { getUniqueStringValues } from '$lib/utils/getUniqeValues';
-import type { Filters, ProductCategory, Style, SubCategory } from '../../../types/filters';
-import type { UntappdProduct, VinmonopoletProduct } from '../../../types/product';
-import type { Stock } from '../../../types/stock';
+import type {
+	CreateFilters,
+	Filters,
+	ProductCategory,
+	Style,
+	SubCategory
+} from '../../types/filters';
+import type { UntappdProduct, VinmonopoletProduct } from '../../types/product';
+import type { Stock } from '../../types/stock';
 
 const sortCategoriesByNameReversed = (a: ProductCategory, b: ProductCategory) => {
 	return a.name < b.name ? 1 : -1;
@@ -72,17 +78,16 @@ const getAllAvailableSubCategoriesForCategory = (
 	);
 };
 
-const getProductCategories = (stock: Stock[]): ProductCategory[] => {
-	const allProducts = stock.map((stockEntry) => stockEntry.product);
+const getProductCategories = (products: VinmonopoletProduct[]): ProductCategory[] => {
 	const availableProductCategories = getUniqueStringValues<VinmonopoletProduct>(
-		allProducts,
+		products,
 		'category'
 	);
 
 	return availableProductCategories
 		.map((category) => {
 			const availableSubCategoriesForCategory = getAllAvailableSubCategoriesForCategory(
-				allProducts,
+				products,
 				category
 			);
 			return createNewCategory(category, availableSubCategoriesForCategory, category === 'Øl');
@@ -90,8 +95,8 @@ const getProductCategories = (stock: Stock[]): ProductCategory[] => {
 		.sort(sortCategoriesByNameReversed);
 };
 
-export const createFilters = (stock: Stock[]): Filters => {
-	const categories = getProductCategories(stock);
+export const createFiltersFromStock = (stock: Stock[]): Filters => {
+	const categories = getProductCategories(stock.map((stockEntry) => stockEntry.product));
 	return {
 		price: [0, 1000],
 		abv: [0, 20],
@@ -99,4 +104,16 @@ export const createFilters = (stock: Stock[]): Filters => {
 		removeUserCheckedInProducts: false,
 		productCategories: categories
 	};
+};
+
+export const createFilters = (createFilters: CreateFilters): Filters => {
+	return {
+		price: createFilters.price ? [createFilters.price.min, createFilters.price.max] : undefined,
+		abv: createFilters.abv ? [createFilters.abv.min, createFilters.abv.max] : undefined,
+		onlyShowNewArrivals: createFilters.onlyShowNewArrivals,
+		removeUserCheckedInProducts: createFilters.removeUserCheckedInProduct,
+		productCategories: createFilters.productCategories.map((category) =>
+			createNewCategory(category.name, category.subCategories, category.checked)
+		)
+	} satisfies Filters;
 };

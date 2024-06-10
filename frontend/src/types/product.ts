@@ -1,3 +1,27 @@
+export enum ProductCategory {
+	ØL = 'Øl',
+	SIDER = 'Sider',
+	MJØD = 'Mjød'
+}
+
+export enum ProductSubCategory {
+	BARLEY_WINE = 'Barley wine',
+	BROWN_ALE = 'Brown ale',
+	HVETEØL = 'Hveteøl',
+	INDIA_PALE_ALE = 'India pale ale',
+	KLOSTERSTIL = 'Klosterstil',
+	LYS_ALE = 'Lys ale',
+	LYS_LAGER = 'Lys lager',
+	MØRK_LAGER = 'Mørk lager',
+	PALE_ALE = 'Pale ale',
+	PORTER_OG_STOUT = 'Porter & stout',
+	RED_AMBER = 'Red/amber',
+	SAISON_FARMHOUSE_ALE = 'Saison farmhouse ale',
+	SCOTCH_ALE = 'Scotch ale',
+	SPESIAL = 'Spesial',
+	SURØL = 'Surøl'
+}
+
 export type VinmonopoletProduct = {
 	vmp_id: string;
 	vmp_name: string;

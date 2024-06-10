@@ -21,6 +21,8 @@ declare global {
 			stores: Store[];
 			releases: Releases;
 			isAuthenticated: boolean;
+			stock?: Stock[];
+			title?: string;
 		}
 		// interface Platform {}
 	}

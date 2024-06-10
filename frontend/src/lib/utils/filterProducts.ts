@@ -1,6 +1,6 @@
-import type { Filters, ProductCategory, Style, SubCategory } from '../../../types/filters';
-import type { VinmonopoletProduct } from '../../../types/product';
-import type { Stock } from '../../../types/stock';
+import type { Filters, ProductCategory, Style, SubCategory } from '../../types/filters';
+import type { VinmonopoletProduct } from '../../types/product';
+import type { Stock } from '../../types/stock';
 
 const filterProductsByPrice = (stock: Stock[], price: number[]) => {
 	return stock.filter(({ product }) => product.price >= price[0] && product.price <= price[1]);
@@ -49,6 +49,7 @@ const filterProductsByCategory = (stock: Stock[], productCategories: ProductCate
 	const activeSubCategories = activeProductCategories.flatMap(({ subCategories }) =>
 		subCategories.filter(({ checked }) => checked)
 	);
+
 	const activeStyles = activeSubCategories.flatMap(({ styles }) =>
 		styles.filter(({ checked }) => checked)
 	);
@@ -61,14 +62,19 @@ const filterProductsByCategory = (stock: Stock[], productCategories: ProductCate
 	);
 };
 
-export const filterProducts = (stock: Stock[], filters: Filters) => {
-	let filteredProducts = filterProductsByPrice(stock, filters.price);
-	filteredProducts = filterProductsByAbv(filteredProducts, filters.abv);
-	filteredProducts = filterProductsByNewArrivalsOnly(filteredProducts, filters.onlyShowNewArrivals);
-	filteredProducts = filterProductsByUserHasHad(
-		filteredProducts,
-		filters.removeUserCheckedInProducts
-	);
+export const filterStock = (stock: Stock[], filters: Filters) => {
+	let filteredProducts =
+		filters.price !== undefined ? filterProductsByPrice(stock, filters.price) : stock;
+	filteredProducts =
+		filters.abv !== undefined ? filterProductsByAbv(filteredProducts, filters.abv) : stock;
+	filteredProducts =
+		filters.onlyShowNewArrivals !== undefined
+			? filterProductsByNewArrivalsOnly(filteredProducts, filters.onlyShowNewArrivals)
+			: stock;
+	filteredProducts =
+		filters.removeUserCheckedInProducts !== undefined
+			? filterProductsByUserHasHad(filteredProducts, filters.removeUserCheckedInProducts)
+			: stock;
 	filteredProducts = filterProductsByCategory(filteredProducts, filters.productCategories);
 
 	return filteredProducts;
