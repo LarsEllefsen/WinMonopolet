@@ -5,7 +5,7 @@
 	import { searchStores } from '$lib/utils/searchStores';
 	import { sortStoresByRelevancy } from '$lib/utils/sortStoresByRelevancy';
 	import SearchInput from '../searchInput/SearchInput.svelte';
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	export let searchIsActive = false;
 
@@ -57,7 +57,7 @@
 	{#if searchIsActive}
 		<div
 			transition:slide|global
-			class="absolute border-b border-black top-16 left-0 w-screen pt-4 bg-white"
+			class="absolute border-b border-black top-16 left-0 w-screen pt-4 bg-white z-50"
 		>
 			<SearchInput
 				bind:inputElement={searchInputElement}
@@ -81,5 +81,9 @@
 				</ul>
 			{/if}
 		</div>
+		<div
+			transition:fade
+			class="absolute w-full h-dvh bg-black opacity-40 left-0 top-[80px] pointer-events-none"
+		/>
 	{/if}
 </div>
