@@ -17,9 +17,23 @@ export type ProductCategory = Category & {
 };
 
 export type Filters = {
-	price: number[];
-	abv: number[];
-	onlyShowNewArrivals: boolean;
-	removeUserCheckedInProducts: boolean;
+	price?: number[];
+	abv?: number[];
+	onlyShowNewArrivals?: boolean;
+	removeUserCheckedInProducts?: boolean;
 	productCategories: ProductCategory[];
+};
+
+type CreateRangeFilter = { min: number; max: number; defaultValue: number[] };
+
+export type CreateFilters = {
+	price?: CreateRangeFilter;
+	abv?: CreateRangeFilter;
+	onlyShowNewArrivals?: boolean;
+	removeUserCheckedInProduct?: boolean;
+	productCategories: {
+		name: string;
+		checked: boolean;
+		subCategories: { name: string; checked: boolean; styles: Style[] }[];
+	}[];
 };

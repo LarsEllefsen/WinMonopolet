@@ -338,11 +338,22 @@ export class ProductsRepository {
 
 		if (subCategories !== undefined) {
 			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
-			queryList.push(
-				`vp.sub_category IN (${subCategories.map(
-					(_, i) => `$${i + (parameters.length + 1)}`,
-				)})`,
-			);
+
+			// Sider and Mjød do not have sub categories.
+			if (categories?.includes('Sider') || categories?.includes('Mjød')) {
+				queryList.push(
+					`(vp.sub_category IN (${subCategories.map(
+						(_, i) => `$${i + (parameters.length + 1)}`,
+					)}) OR vp.sub_category IS NULL)`,
+				);
+			} else {
+				queryList.push(
+					`vp.sub_category IN (${subCategories.map(
+						(_, i) => `$${i + (parameters.length + 1)}`,
+					)})`,
+				);
+			}
+
 			parameters.push(...subCategories);
 		}
 

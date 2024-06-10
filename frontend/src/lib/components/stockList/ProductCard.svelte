@@ -44,7 +44,9 @@
 	</div>
 	<div class="md:col-span-8 sm:col-span-8 xs:col-span-9 col-span-8 ml-4">
 		<div>
-			<h3 class="md:text-xl text-xl font-bold leading-tight">{stock.product.vmp_name}</h3>
+			<h3 class="md:text-xl text-xl font-bold leading-tight break-words">
+				{stock.product.vmp_name}
+			</h3>
 
 			<p class="md:text-lg text-base">{stock.product.untappd.brewery}</p>
 			<p class="font-light">{stock.product.untappd.style}</p>

@@ -6,6 +6,7 @@ import {
 	Query,
 	Param,
 	Delete,
+	ParseArrayPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateUntappdProductFromIdDTO } from './dto/createUntappdProductFromIdDTO';
@@ -33,8 +34,16 @@ export class ProductsController {
 		@Query('hasUntappdProduct', ParseOptionalBoolPipe)
 		hasUntappdProduct?: boolean,
 		@Query('active', ParseOptionalBoolPipe) active?: boolean,
-		@Query('productCategories') categories?: string[],
-		@Query('subCategories') subCategories?: string[],
+		@Query(
+			'productCategory',
+			new ParseArrayPipe({ items: String, optional: true }),
+		)
+		categories?: string[],
+		@Query(
+			'productSubCategory',
+			new ParseArrayPipe({ items: String, optional: true }),
+		)
+		subCategories?: string[],
 		@Query('limit') limit?: number,
 		@Query('offset') offset?: number,
 		@Query('sortBy', ParseProductSortKey)
