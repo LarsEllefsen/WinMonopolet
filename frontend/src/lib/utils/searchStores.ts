@@ -7,7 +7,7 @@ const filterStoresBySearchInput = (
 ) => {
 	return stores.filter((store) => {
 		const storeName = stripSpecialCharacters
-			? store.name.replace(new RegExp(/[^a-zA-Z ]/, 'i'), '')
+			? store.name.replace(new RegExp(/[^a-åA-Å ]/, 'i'), '')
 			: store.name;
 		return storeName.toUpperCase().includes(searchInput.toUpperCase());
 	});
