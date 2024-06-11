@@ -2,6 +2,12 @@
 
 Winmonopolet is a webapp that matches all the beers, ciders and meads at [Vinmonopolet](https://vinmonopolet.no) to [Untappd](https://untappd.com/) in order to help you find the best rated beers in stock, right now, at your local Vinmonopolet outlet.
 
+<br>
+<br>
+<br>
+
+<p align="center"><img src="https://winmonopolet.no/images/snirkel.svg" width="200"></p>
+
 ## Development setup
 
 ### Note
