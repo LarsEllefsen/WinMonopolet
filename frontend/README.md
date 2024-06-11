@@ -1,3 +1,0 @@
-# .env
-
-AUTH_SECRET=\*\*\*\*
