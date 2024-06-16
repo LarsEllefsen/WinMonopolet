@@ -12,7 +12,8 @@
 		(store: Store) => store.store_id === $page.params.store_id
 	) as Store;
 	$: filters = createFiltersFromStock($page.data.stock ?? []);
-	$: stock = filterStock($page.data.stock ?? [], filters).slice(0, 20);
+	$: stock = $page.data.stock ?? [];
+	$: stockToShow = filterStock(stock ?? [], filters).slice(0, numProductsToShow);
 </script>
 
 <div class="container mx-auto relative">
@@ -22,7 +23,7 @@
 		</div>
 		<ProductFilters bind:filters on:filter={async (event) => (filters = event.detail)} />
 		<div class="lg:col-span-6 md:col-span-10 md:col-start-2 col-span-full">
-			<StockList {stock} bind:numProductsToShow maxLength={stock.length} />
+			<StockList stock={stockToShow} bind:numProductsToShow maxLength={stock.length} />
 		</div>
 	</div>
 </div>

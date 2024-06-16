@@ -8,7 +8,8 @@
 	let numProductsToShow = 20;
 
 	$: filters = createFiltersFromStock($page.data.stock ?? []);
-	$: products = filterStock($page.data.stock ?? [], filters);
+	$: products = $page.data.stock ?? [];
+	$: productsToShow = filterStock($page.data.stock ?? [], filters).slice(0, numProductsToShow);
 </script>
 
 <div class="container mx-auto relative">
@@ -18,7 +19,7 @@
 		</div>
 		<ProductFilters bind:filters on:filter={async (event) => (filters = event.detail)} />
 		<div class="lg:col-span-6 md:col-span-10 md:col-start-2 col-span-full">
-			<StockList stock={products} bind:numProductsToShow maxLength={products.length} />
+			<StockList stock={productsToShow} bind:numProductsToShow maxLength={products.length} />
 		</div>
 	</div>
 </div>

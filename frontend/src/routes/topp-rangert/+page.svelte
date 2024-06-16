@@ -66,6 +66,7 @@
 	};
 
 	$: products = $page.data.stock ?? [];
+	$: productsToShow = products.slice(0, numProductsToShow);
 	$: filters = createFilters(getFiltersFromSearchParams($page.url.searchParams));
 </script>
 
@@ -80,7 +81,7 @@
 		/>
 
 		<div class="lg:col-span-6 md:col-span-10 md:col-start-2 col-span-full">
-			<StockList stock={products} bind:numProductsToShow maxLength={products.length} />
+			<StockList stock={productsToShow} bind:numProductsToShow maxLength={products.length} />
 		</div>
 	</div>
 </div>
