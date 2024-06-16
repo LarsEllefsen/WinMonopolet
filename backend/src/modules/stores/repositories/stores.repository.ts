@@ -14,10 +14,9 @@ export type StoresRow = {
 	store_id: string;
 	name: string;
 	formatted_name: string;
-	category: number;
 	address: string;
-	city: string;
-	zip: string;
+	city?: string;
+	zip?: string;
 	lon: string;
 	lat: string;
 };
@@ -98,24 +97,22 @@ export class StoresRepository {
 		await this.connectionPool.query(
 			`
 		INSERT INTO stores 
-			(store_id, name, formatted_name, category, address, city, zip, lon, lat)
+			(store_id, name, formatted_name, address, city, zip, lon, lat)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			($1, $2, $3, $4, $5, $6, $7, $8)
 		ON CONFLICT(store_id) DO UPDATE SET
 			name = $2,
 			formatted_name = $3,
-			category = $4,
-			address = $5,
-			city = $6,
-			zip = $7,
-			lon = $8,
-			lat = $9
+			address = $4,
+			city = $5,
+			zip = $6,
+			lon = $7,
+			lat = $8
 		`,
 			[
 				store.store_id,
 				store.name,
 				store.formatted_name,
-				store.category,
 				store.address,
 				store.city,
 				store.zip,
@@ -136,7 +133,6 @@ export class StoresRepository {
 			row.store_id,
 			row.name,
 			row.formatted_name,
-			row.category,
 			row.address,
 			row.city,
 			row.zip,

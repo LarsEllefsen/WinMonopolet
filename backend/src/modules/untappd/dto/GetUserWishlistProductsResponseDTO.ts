@@ -1,5 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { UntappdUserProductDTO } from './UntappdUserProductDTO';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 import { UntappdUserWishlistProductDTO } from './UntappdUserWishlistProductDTO';
 
 export class GetUserWishlistProductResponseDTO {

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { JobStatus, Queue } from 'bull';
+import { JobStatus } from 'bull';
 
 @Injectable()
 export class ParseJobStatus implements PipeTransform {

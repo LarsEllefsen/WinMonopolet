@@ -3,17 +3,15 @@ export class Store {
 		storeId: string,
 		name: string,
 		formattedName: string,
-		category: number,
 		address: string,
-		city: string,
-		zip: string,
+		city: string | undefined,
+		zip: string | undefined,
 		lon: string,
 		lat: string,
 	) {
 		this.store_id = storeId;
 		this.name = name;
 		this.formatted_name = formattedName;
-		this.category = category;
 		this.address = address;
 		this.city = city;
 		this.zip = zip;
@@ -27,13 +25,11 @@ export class Store {
 
 	formatted_name: string;
 
-	category: number;
-
 	address: string;
 
-	city: string;
+	city?: string;
 
-	zip: string;
+	zip?: string;
 
 	lon: string;
 

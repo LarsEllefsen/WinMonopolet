@@ -1,0 +1,17 @@
+-- migrate:up
+ALTER TABLE stores
+ALTER COLUMN city
+DROP NOT NULL;
+
+ALTER TABLE stores
+ALTER COLUMN zip
+DROP NOT NULL;
+
+-- migrate:down
+ALTER TABLE stores
+ALTER COLUMN city
+SET NOT NULL;
+
+ALTER TABLE stores
+ALTER COLUMN zip
+SET NOT NULL;

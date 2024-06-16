@@ -1,5 +1,4 @@
 import { Stock } from '@modules/stores/entities/stock.entity';
-import { User } from '@modules/users/entities/user.entity';
 import type { MatcherFunction, ExpectationResult } from 'expect';
 
 const toMatchStock: MatcherFunction<[expectedUser: unknown]> = (

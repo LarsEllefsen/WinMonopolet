@@ -93,7 +93,6 @@ describe('storesRepository', () => {
 				zip: '4201',
 				lat: '1',
 				lon: '2',
-				category: 4,
 			});
 
 			await storeRepository.saveStore(modifiedStore);

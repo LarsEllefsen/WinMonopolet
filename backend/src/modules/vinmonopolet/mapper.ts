@@ -1,5 +1,5 @@
 import { VinmonopoletProduct } from '@modules/products/entities/vinmonopoletProduct.entity';
-import { BaseProduct, PopulatedStore } from 'vinmonopolet-ts';
+import { BaseProduct, BaseStore } from 'vinmonopolet-ts';
 import { VinmonopoletProductWithStockLevel } from './vinmonopolet.interface';
 import { Store } from '@modules/stores/entities/stores.entity';
 import { toSnakeCase } from '@utils/toSnakeCase';
@@ -62,24 +62,15 @@ export const mapToVinmonopoletProductWithStockLevel = (
 	};
 };
 
-export const mapToStore = (storeDTO: PopulatedStore) => {
+export const mapToStore = (storeDTO: BaseStore) => {
 	return new Store(
 		storeDTO.storeNumber,
 		storeDTO.name,
 		toSnakeCase(storeDTO.name),
-		getCategoryFromString(storeDTO.category),
-		storeDTO.postalAddress,
-		storeDTO.postalCity,
-		storeDTO.postalZip,
+		storeDTO.streetAddress,
+		storeDTO.city,
+		storeDTO.zip,
 		storeDTO.gpsCoordinates[1].toString(),
 		storeDTO.gpsCoordinates[0].toString(),
 	);
-};
-
-const getCategoryFromString = (categoryString: string): number => {
-	const category = categoryString.split(' ').at(1);
-	if (category === undefined) {
-		return Number(categoryString);
-	}
-	return Number(category);
 };

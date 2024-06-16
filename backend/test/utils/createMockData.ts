@@ -15,15 +15,12 @@ import { UntappdUserProductDTO } from '@modules/untappd/dto/UntappdUserProductDT
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
 
 const test_store_id = '160';
-const test_vmp_id = '14962702';
-const test_untappd_id = '5072941';
 
 export const createMockStore = ({
 	store_id = test_store_id,
 	name = 'Trondheim, Trondheim Torg',
 	formatted_name = 'trondheim_trondheim_torg',
 	address = 'Kongens Gate 11',
-	category = 6,
 	city = 'Trondheim',
 	lat = '63.4303344',
 	lon = '10.3932725',
@@ -33,7 +30,6 @@ export const createMockStore = ({
 		store_id,
 		name,
 		formatted_name,
-		category,
 		address,
 		city,
 		zip,

@@ -6685,10 +6685,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vinmonopolet-ts@2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-2.1.1.tgz#8ea270f5fd408f3cabe577103bb1384929535313"
-  integrity sha512-QdkVE2uSwAqUM6D9CfxvGQ+DLADdxGpufvPqlNfqldXE6m9/c8okkx7pF/KS7Yeqvnr8eRvE7tx4dRqFVWF7lg==
+vinmonopolet-ts@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-3.0.0.tgz#ad1b8dd83b4a265286a12ee14b47f4faed1c1858"
+  integrity sha512-/4fcNNHlH+A7R211N5wBDS3PZfz1W7oYsT31UUWfeQMyWYyI1kw0aJ5aVg+Mm6UJq/AchPgETRFC9FrfigbG7Q==
   dependencies:
     class-transformer "^0.5.1"
     class-validator "^0.14.0"

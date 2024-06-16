@@ -8,7 +8,7 @@ module.exports = {
 	moduleFileExtensions: ['js', 'json', 'ts'],
 	rootDir: '.',
 	testEnvironment: 'node',
-	testRegex: 'product.repository.integration-spec.ts$',
+	testRegex: '.integration-spec.ts$',
 	transform: {
 		'^.+\\.(t|j)s$': 'ts-jest',
 	},
