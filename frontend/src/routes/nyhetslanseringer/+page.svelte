@@ -13,23 +13,21 @@
 
 <PageLayout>
 	<Heading level={1} centered>Nyhetslanseringer</Heading>
-	<div class="grid grid-cols-12 md:mt-12 mt-4 gap-x-4 lg:gap-y-12 gap-y-8">
-		<div
-			class="xl:col-span-6 lg:col-span-8 col-span-full xl:col-start-4 lg:col-start-3 text-center"
-		>
+	<div class="grid grid-cols-12 md:mt-12 mt-4 gap-x-4 lg:gap-y-20 gap-y-8">
+		<div class="xl:col-span-6 lg:col-span-8 col-span-full xl:col-start-4 lg:col-start-3">
 			<p class="text-lg mb-8">
-				Her kan du se en oversikt over alle kommende og tidligere lanseringer med alle produktene
-				sortert etter Untappd rating. Dataen hentes fra <a
-					class="text-link"
+				Her kan du se en oversikt over alle kommende og tidligere <a
 					href="https://www.vinmonopolet.no/content/lanseringer/kommende-lanseringer"
-					>Vinmonopolet sine lanseringslister</a
-				> og blir oppdatert forløpende.
+					class="text-link">nyhetslanseringer på Vinmonopolet</a
+				>,
+				<span class="underline">med alle produkter i lanseringen sortert etter Untappd rating</span
+				>. Lanseringer blir tilgjengelig ca 4 dager før lanseringsdato.
 			</p>
 
-			<p class="font-light mb-8">
+			<p class="font-light mb-4">
 				Merk at noen produkter kan mangle i kommende lanseringer, ofte fordi produktet er så nytt at
-				det ikke finnes en Untappd side for den enda, eller at den har så få ratings at den ikke har
-				fått noen total rating enda.
+				det ikke finnes på Untappd enda, eller at den har så få check-ins at den ikke har fått noen
+				rating enda.
 			</p>
 
 			<p class="font-light">

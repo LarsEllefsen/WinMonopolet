@@ -8,6 +8,7 @@
 	import { sortStoresByRelevancy } from '$lib/utils/sortStoresByRelevancy';
 	import SearchInput from '../searchInput/SearchInput.svelte';
 	import { page } from '$app/stores';
+	import Heading from '../heading/Heading.svelte';
 
 	export let stores: Store[];
 
@@ -46,7 +47,7 @@
 </script>
 
 <div class="">
-	<h2 class="text-3xl mb-4">Finn butikk</h2>
+	<Heading level={2}>Finn butikk</Heading>
 
 	<p class="mb-8 font-light">
 		{isLoggedIn
