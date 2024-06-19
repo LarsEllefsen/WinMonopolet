@@ -98,10 +98,9 @@ CREATE TABLE public.stores (
     store_id text NOT NULL,
     name text NOT NULL,
     formatted_name text NOT NULL,
-    category integer NOT NULL,
     address text NOT NULL,
-    city text NOT NULL,
-    zip text NOT NULL,
+    city text,
+    zip text,
     lon text NOT NULL,
     lat text NOT NULL
 );
@@ -212,7 +211,6 @@ CREATE TABLE public.vinmonopolet_products (
     country text NOT NULL,
     added_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     last_updated timestamp with time zone NOT NULL,
-    active boolean NOT NULL,
     buyable boolean DEFAULT true NOT NULL
 );
 
@@ -471,4 +469,7 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20240418182752'),
     ('20240418182955'),
     ('20240418183052'),
-    ('20240418183359');
+    ('20240418183359'),
+    ('20240502211931'),
+    ('20240616122035'),
+    ('20240616122155');

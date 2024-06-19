@@ -11,6 +11,17 @@ services:
     environment:
       - UNTAPPD_BASE_URL=https://api.untappd.com/v4/
 
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=winmonopolet_dev
+      - POSTGRES_USER=winmonopolet_dev
+    volumes:
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
   redis:
     image: redis:latest
     restart: always
