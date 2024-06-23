@@ -13,9 +13,7 @@ export async function load({ params }) {
 		({ vinmonopoletProduct }) => ({ stock_level: 0, product: vinmonopoletProduct } satisfies Stock)
 	);
 	return {
-		releaseDate: `Nyhetslansering ${getReadableDateFormat(
-			new Date(productsInRelease[0].releaseDate)
-		)}`,
+		title: `Nyhetslansering ${getReadableDateFormat(new Date(params.release_id))}`,
 		stock
 	};
 }
