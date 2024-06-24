@@ -201,9 +201,19 @@ export const createMockVinmonopoletProductDTO = ({
 	baseProduct.volume = volume;
 	baseProduct.district = district;
 	baseProduct.subDistrict = district;
-	baseProduct.availability = {
-		deliveryAvailability: { available: true, mainText: '' },
-		storeAvailability: { available: true, mainText: '' },
+	baseProduct.productAvailability = {
+		deliveryAvailability: {
+			availableForPurchase: true,
+			infos: [
+				{ availability: '15 stk på lager', readableValue: '15 stk på lager' },
+			],
+		},
+		storesAvailability: {
+			availableForPurchase: true,
+			infos: [
+				{ availability: '15 stk på lager', readableValue: '15 stk på lager' },
+			],
+		},
 	};
 	baseProduct.buyable = true;
 	baseProduct.status = '';

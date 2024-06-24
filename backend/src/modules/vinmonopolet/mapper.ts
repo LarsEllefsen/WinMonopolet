@@ -13,17 +13,24 @@ const getStockLevelFromText = (mainText: string) => {
 
 const getAvailabilityText = (product: BaseProduct) => {
 	if (
-		!product.availability ||
-		(!product.availability.deliveryAvailability &&
-			!product.availability.storeAvailability)
+		!product.productAvailability ||
+		(!product.productAvailability.deliveryAvailability &&
+			!product.productAvailability.storesAvailability)
 	)
 		return null;
-	if (product.availability.storeAvailability) {
-		return product.availability.storeAvailability.mainText;
+	if (
+		product.productAvailability.storesAvailability &&
+		product.productAvailability.storesAvailability.infos.length > 0
+	) {
+		return product.productAvailability.storesAvailability.infos[0].availability;
 	}
 
-	if (product.availability.deliveryAvailability) {
-		return product.availability.deliveryAvailability.mainText;
+	if (
+		product.productAvailability.deliveryAvailability &&
+		product.productAvailability.deliveryAvailability.infos.length > 0
+	) {
+		return product.productAvailability.deliveryAvailability.infos[0]
+			.availability;
 	}
 
 	return null;
@@ -54,9 +61,17 @@ export const mapToVinmonopoletProduct = (
 export const mapToVinmonopoletProductWithStockLevel = (
 	vinmonopoletProductDTO: BaseProduct,
 ): VinmonopoletProductWithStockLevel => {
+	const storeAvailability =
+		vinmonopoletProductDTO?.productAvailability?.storesAvailability;
+	if (storeAvailability.infos.length === 0) {
+		throw new Error(
+			`Unable to get stock level for product ${vinmonopoletProductDTO.code}, missing availability info.`,
+		);
+	}
 	return {
 		stockLevel: getStockLevelFromText(
-			vinmonopoletProductDTO?.availability?.storeAvailability?.mainText,
+			vinmonopoletProductDTO?.productAvailability?.storesAvailability?.infos[0]
+				.availability,
 		),
 		vinmonopoletProduct: mapToVinmonopoletProduct(vinmonopoletProductDTO),
 	};

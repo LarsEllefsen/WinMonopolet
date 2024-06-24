@@ -12,9 +12,4 @@ import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
 	providers: [StoresService, StoresRepository],
 	exports: [StoresService, StoresRepository],
 })
-export class StoresModule implements OnModuleInit {
-	constructor(private service: StoresService) {}
-	async onModuleInit() {
-		//await this.service.testMe();
-	}
-}
+export class StoresModule {}
