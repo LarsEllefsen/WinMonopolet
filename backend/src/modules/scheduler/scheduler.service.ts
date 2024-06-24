@@ -46,10 +46,11 @@ export class SchedulerService {
 		await this.productService.updateUntappdProductsWithScoreOfZero();
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_10AM)
+	@Cron(CronExpression.EVERY_DAY_AT_9AM)
 	private async findAndSaveAnyUpcomingProducts() {
 		if (process.env.NODE_ENV === 'development') return;
 		this.logger.log('Starting scheduled task: findAndSaveAnyUpcomingProducts');
 		await this.productService.findAndSaveAnyUpcomingProducts();
+		await this.cache.reset();
 	}
 }
