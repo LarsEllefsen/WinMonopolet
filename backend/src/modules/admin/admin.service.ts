@@ -1,8 +1,10 @@
 import { ProductsService } from '@modules/products/products.service';
 import { UsersService } from '@modules/users/users.service';
 import { InjectQueue } from '@nestjs/bull';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { JobStatus, Queue } from 'bull';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AdminService {
@@ -10,6 +12,7 @@ export class AdminService {
 		private readonly usersService: UsersService,
 		private readonly productsService: ProductsService,
 		@InjectQueue('user') private userQueue: Queue,
+		@Inject(CACHE_MANAGER) private cache: Cache,
 	) {}
 
 	getAllUsers() {
@@ -31,7 +34,8 @@ export class AdminService {
 	}
 
 	async findAndSaveAnyUpcomingProducts() {
-		return this.productsService.findAndSaveAnyUpcomingProducts();
+		await this.productsService.findAndSaveAnyUpcomingProducts();
+		await this.cache.reset();
 	}
 
 	private getAllJobsWithStatus(status: JobStatus) {

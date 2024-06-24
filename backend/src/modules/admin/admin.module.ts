@@ -10,6 +10,7 @@ import {
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from '@modules/products/products.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
 	imports: [
@@ -26,6 +27,7 @@ import { ProductsModule } from '@modules/products/products.module';
 				removeOnComplete: true,
 			},
 		}),
+		CacheModule.register(),
 	],
 	controllers: [AdminController],
 	providers: [AdminService],
