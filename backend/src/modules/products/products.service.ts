@@ -219,35 +219,6 @@ export class ProductsService {
 		);
 	}
 
-	async getUpcomingProducts() {
-		const allUpcomingProducts =
-			await this.upcomingProductRepository.getUpcomingProducts();
-
-		const upcomingReleaseDates = [
-			...new Set(
-				allUpcomingProducts.map((product) =>
-					product.releaseDate.toLocaleDateString(
-						'nb-NO',
-						LOCALEDATESTRING_DD_MM_YYYY_OPTIONS,
-					),
-				),
-			),
-		];
-		if (upcomingReleaseDates.length > 1) {
-			this.logger.warn(
-				`Found multiple release dates for the upcoming release. This might indicate that some products have the wrong release date. Found dates: ${upcomingReleaseDates}`,
-			);
-		}
-
-		const releaseDate = [...upcomingReleaseDates][0];
-		return {
-			releaseDate,
-			products: allUpcomingProducts.map(
-				(product) => product.vinmonopoletProduct,
-			),
-		};
-	}
-
 	/**
 	 * Gets all products from Vinmonopolet and either updates the existing product or inserts it as a new product.
 	 * If the product does not have a corresponding untappd product it tries to find a matching product and insert it into the database.

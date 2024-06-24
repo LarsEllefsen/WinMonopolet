@@ -2,7 +2,9 @@ import {
 	ClassSerializerInterceptor,
 	Controller,
 	Get,
+	HttpCode,
 	Param,
+	Post,
 	Query,
 	UseGuards,
 	UseInterceptors,
@@ -34,5 +36,11 @@ export class AdminController {
 		return (await this.adminService.getUsersInQueueWithStatus(status)).map(
 			mapJobToQueueJobDTO,
 		);
+	}
+
+	@Post('/scheduler/find-and-save-any-upcoming-products')
+	@HttpCode(204)
+	triggerFindAndSaveAnyUpcomingProducts() {
+		this.adminService.findAndSaveAnyUpcomingProducts();
 	}
 }

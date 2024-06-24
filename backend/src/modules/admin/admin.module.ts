@@ -9,12 +9,14 @@ import {
 } from '@common/constants';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { ProductsModule } from '@modules/products/products.module';
 
 @Module({
 	imports: [
 		JwtModule,
 		ConfigModule,
 		UsersModule,
+		ProductsModule,
 		BullModule.registerQueue({
 			name: 'user',
 			defaultJobOptions: {

@@ -1,3 +1,4 @@
+import { ProductsService } from '@modules/products/products.service';
 import { UsersService } from '@modules/users/users.service';
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -7,6 +8,7 @@ import { JobStatus, Queue } from 'bull';
 export class AdminService {
 	constructor(
 		private readonly usersService: UsersService,
+		private readonly productsService: ProductsService,
 		@InjectQueue('user') private userQueue: Queue,
 	) {}
 
@@ -26,6 +28,10 @@ export class AdminService {
 	async getUsersInQueueWithStatus(status: JobStatus) {
 		const jobs = await this.getAllJobsWithStatus(status);
 		return jobs;
+	}
+
+	async findAndSaveAnyUpcomingProducts() {
+		return this.productsService.findAndSaveAnyUpcomingProducts();
 	}
 
 	private getAllJobsWithStatus(status: JobStatus) {
