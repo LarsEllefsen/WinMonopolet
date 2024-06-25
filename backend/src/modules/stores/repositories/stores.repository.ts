@@ -85,7 +85,7 @@ export class StoresRepository {
             INNER JOIN vinmonopolet_products vp ON s.vmp_id = vp.vmp_id
             INNER JOIN untappd_products up ON vp.vmp_id = up.vmp_id
             WHERE store_id = $1
-			AND buyabe is true
+			AND buyable is true
             ORDER BY up.rating DESC
             `,
 			[storeId],
