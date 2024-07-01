@@ -64,7 +64,9 @@ const getAllAvailableSubCategoriesForCategory = (
 	const allAvailableSubCategories =
 		category === 'Øl'
 			? getUniqueStringValues<VinmonopoletProduct>(
-					products.filter((product) => product.category === category),
+					products.filter(
+						(product) => product.category === category && product.sub_category != null
+					),
 					'sub_category'
 			  )
 			: getUniqueStringValues<UntappdProduct>(
@@ -78,7 +80,14 @@ const getAllAvailableSubCategoriesForCategory = (
 		.map((subCategory) =>
 			createNewSubCategory(subCategory, getAllAvailableStylesForSubCategory(products, subCategory))
 		)
-		.sort((a, b) => a.name.localeCompare(b.name));
+		.sort((a, b) => {
+			try {
+				return a.name.localeCompare(b.name);
+			} catch (e) {
+				console.log({ a, b });
+				throw e;
+			}
+		});
 };
 
 const getProductCategories = (products: VinmonopoletProduct[]): ProductCategory[] => {
