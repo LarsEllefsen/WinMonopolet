@@ -14,11 +14,9 @@ Winmonopolet is a webapp that matches all the beers, ciders and meads at [Vinmon
 
 Some functionality will not work locally. API calls to untappd and user authentication will not work without an API key, but is not strictly required for general development. I am currently working on mocking more of the external services to make it easier to develop locally without API access to untappd.
 
-I also plan on providing a sample database, but as of this writing this is not available just yet. But soon!
-
 ### Prerequisites
 
-- A Postgres instance
+- A Postgres instance. A docker compose file is included for easy setup.
 - Node v16 or later
 
 ### Install
@@ -50,16 +48,16 @@ Create a .env file in both the backend and frontend folders.
 DATABASE_URL=postgres://<user>:<password>@l<host>:<port>/<db>?sslmode=disable
 
 # The postgres database user
-DB_USER=<user>
+DB_USER=winmonopolet_dev
 
-# The postgres database port
-DB_PORT=<port>
+# The postgres database port. 5433 is the port of the docker database provided
+DB_PORT=5433
 
 # The postgres database user
-DB_PASSWORD=<password>
+DB_PASSWORD=winmonopolet_dev
 
 # The postgres database name
-DB_NAME=<name>
+DB_NAME=postgres
 
 # The api key used to send mails. Unless you want to test email sending this can be a dummy value
 MAILGUN_API_KEY=dummykey
@@ -93,13 +91,25 @@ JWT_SECRET=17oHEhYkSOSWTrW7rue46UJmKqIoBmaC
 
 ```
 
-#### Run database migrations
+#### Start the database
 
-In the backend directory run:
+The easiest way to get started is to simply use the provided docker compose file. This will automatically create a dockerized postgres database with sample data included.
+
+To start the docker database:
+
+```
+docker compose --file docker-database.yaml up -d
+```
+
+The database will be available at `localhost:5433` with password and username `winmonopolet_dev`.
+
+If you wish to use your own database you can get started by adjusting .env file to match your configuration and running the database migrations (while in the backend folder):
 
 ```
 npm run migrate
 ```
+
+Sample data is provided in the `backend/db/sampledata` folder.
 
 #### Start the backend
 

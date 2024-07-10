@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=winmonopolet_dev
+      - POSTGRES_USER=winmonopolet_dev
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/00_init.sql
+      - ./backend/db/sampledata:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
