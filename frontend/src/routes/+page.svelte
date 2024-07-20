@@ -2,6 +2,7 @@
 	import Heading from '$lib/components/heading/Heading.svelte';
 	import StorePicker from '$lib/components/storePicker/StorePicker.svelte';
 	import ReleaseCard from '$lib/components/releaseCard/ReleaseCard.svelte';
+	import Banner from '$lib/components/banner/Banner.svelte';
 
 	export let data;
 
@@ -14,6 +15,15 @@
 			<img class="lg:w-3/4 w-full mx-auto" src="/images/logo.svg" alt="Winmonopolet logo" />
 
 			<div class="grid grid-cols-12 lg:my-20 mt-12 mb-12">
+				<div class="md:col-span-full col-span-full lg:mb-12 mb-8">
+					<Banner>
+						Det er for tiden problemer med apiet til Untappd. Frem til problemet er fikset vil ikke
+						innlogging fungere, nye produkter i vinmonopolet sortiment vil ikke vises og
+						eksisterende ratinger vil ikke bli oppdatert. <br /> <br />Beklager ulempen, det jobbes
+						med saken!
+					</Banner>
+				</div>
+
 				<div class="md:col-span-8 col-span-full">
 					<p class="text-xl mb-8">
 						<span class="text-wmp font-semibold">Winmonopolet</span> sitt mål er å gjøre det enkelt for
