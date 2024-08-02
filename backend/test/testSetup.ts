@@ -2,12 +2,10 @@ import toBeWithinSecondsOfDate from './utils/matchers/toBeWithinSecondsOfDate';
 import toEqualDateIgnoringTime from './utils/matchers/toEqualDateIgnoringTime';
 import toMatchProduct from './utils/matchers/toMatchProduct';
 import toMatchStock from './utils/matchers/toMatchStock';
-import toMatchUser from './utils/matchers/toMatchUser';
 
 expect.extend({
 	toMatchProduct,
 	toBeWithinSecondsOfDate,
-	toMatchUser,
 	toMatchStock,
 	toEqualDateIgnoringTime,
 });

@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import {
 	BadRequestException,
 	ForbiddenException,
@@ -9,191 +8,91 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AxiosError, AxiosResponse } from 'axios';
-import { catchError, delay, map } from 'rxjs';
-import { UntappdSearchResultDTO } from './dto/UntappdSearchResultDTO';
 import { APILimitReachedException } from '@exceptions/APILimitReachedException';
-import { X_RATELIMIT_REMAINING_HEADER } from '@common/constants';
 import { TooManyRequestsException } from '@exceptions/TooManyRequestsException';
-import { GetBeerInfoResponseDTO } from './dto/GetBeerInfoResponseDTO';
-import { plainToInstance } from 'class-transformer';
-import { UntappdUserDTO } from './dto/UntappdUserDTO';
-import { GetUserProductResponseDTO } from './dto/GetUserProductResponseDTO';
-import { GetUserWishlistProductResponseDTO } from './dto/GetUserWishlistProductsResponseDTO';
-
-type UntappdApiError = {
-	meta: {
-		code: number;
-		error_detail: string;
-		error_type: string;
-	};
-};
+import {
+	Beer,
+	getBeer,
+	HTTPException,
+	searchBeers,
+	SearchResult,
+} from 'untappd-node';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UntappdClient {
-	baseUrl: string;
-	clientId: string;
-	clientSecret: string;
-	baseQueryParams: Record<string, string>;
+	remainingAPICalls: number;
 
-	constructor(
-		private readonly configService: ConfigService,
-		private readonly httpService: HttpService,
-	) {
-		this.baseUrl = this.getOrThrow('UNTAPPD_BASE_URL');
-		this.clientId = this.getOrThrow('UNTAPPD_CLIENT_ID');
-		this.clientSecret = this.getOrThrow('UNTAPPD_CLIENT_SECRET');
-		this.baseQueryParams = {
-			client_id: this.clientId,
-			client_secret: this.clientSecret,
-		};
+	constructor() {
+		this.remainingAPICalls = 100;
 	}
 
 	private readonly logger = new Logger(UntappdClient.name);
 	private readonly DELAY = 2500;
 
-	search(query: string) {
-		const queryParams = {
-			...this.baseQueryParams,
-			q: query,
-		};
-		return this.GET<{ response: UntappdSearchResultDTO }>(
-			'search/beer',
-			queryParams,
-		)
-			.pipe(
-				map((response) => ({
-					remainingApiCalls: response.remainingApiCalls,
-					searchResult: response.body.response,
-				})),
-			)
-			.pipe(delay(this.DELAY));
-	}
-
-	getBeerInfo(untappd_id: string) {
-		return this.GET<{ response: GetBeerInfoResponseDTO }>(
-			`beer/info/${untappd_id}`,
-			this.baseQueryParams,
-		)
-			.pipe(
-				map(({ body }) =>
-					plainToInstance(GetBeerInfoResponseDTO, body.response),
-				),
-			)
-			.pipe(delay(this.DELAY));
-	}
-
-	getUserInfo(accessToken: string) {
-		return this.GET<{ response: { user: UntappdUserDTO } }>(`user/info`, {
-			access_token: accessToken,
-		}).pipe(
-			map(({ body }) => plainToInstance(UntappdUserDTO, body.response.user)),
+	async search(
+		query: string,
+		delay = this.DELAY,
+	): Promise<{ remainingAPICalls: number; searchResult: SearchResult[] }> {
+		const searchResult = await this.GET(() => searchBeers(query));
+		return new Promise((resolve) =>
+			setTimeout(
+				() =>
+					resolve({ remainingAPICalls: this.remainingAPICalls, searchResult }),
+				delay,
+			),
 		);
 	}
 
-	getUserProducts(offset: number, accessToken: string) {
-		return this.GET<{ response: GetUserProductResponseDTO }>(`user/beers`, {
-			access_token: accessToken,
-			limit: 50,
-			offset,
-			sort: 'date_asc',
-		})
-			.pipe(
-				map(({ body, remainingApiCalls }) => ({
-					body: plainToInstance(GetUserProductResponseDTO, body.response),
-					remainingApiCalls,
-				})),
-			)
-			.pipe(delay(this.DELAY));
-	}
-
-	getUserWishlistProducts(offset: number, accessToken: string) {
-		return this.GET<{ response: GetUserWishlistProductResponseDTO }>(
-			`user/wishlist`,
-			{
-				access_token: accessToken,
-				limit: 50,
-				offset,
-				sort: 'date_asc',
-			},
-		)
-			.pipe(
-				map(({ body, remainingApiCalls }) => ({
-					body: plainToInstance(
-						GetUserWishlistProductResponseDTO,
-						body.response,
-					),
-					remainingApiCalls,
-				})),
-			)
-			.pipe(delay(this.DELAY));
-	}
-
-	GET<T>(endpoint: string, params: Record<string, string | number | boolean>) {
-		return this.httpService
-			.get<T>(`${this.baseUrl}${endpoint}`, {
-				params: params,
-				headers: {
-					'User-Agent': 'Winmonopolet',
-				},
-			})
-			.pipe(
-				catchError((error: AxiosError<UntappdApiError>) =>
-					this.exceptionMapper(error),
-				),
-			)
-			.pipe(map(this.toResponse))
-			.pipe(
-				map((res) => {
-					this.logger.debug('Remaining api calls: ' + res.remainingApiCalls);
-					if (res.remainingApiCalls === 0) throw new APILimitReachedException();
-					return res;
-				}),
-			);
-	}
-
-	private toResponse<T>(axiosResponse: AxiosResponse<T, any>) {
-		return {
-			remainingApiCalls: Number(
-				axiosResponse.headers[X_RATELIMIT_REMAINING_HEADER],
+	async getBeerInfo(
+		id: string,
+		delay = this.DELAY,
+	): Promise<{ remainingAPICalls: number; beer: Beer | null }> {
+		const beer = await this.GET(() => getBeer(id));
+		return new Promise((resolve) =>
+			setTimeout(
+				() => resolve({ remainingAPICalls: this.remainingAPICalls, beer }),
+				delay,
 			),
-			body: axiosResponse.data,
-		};
+		);
 	}
 
-	private getOrThrow(propertyName: string) {
-		const property = this.configService.get<string>(propertyName);
-		if (property == undefined) {
-			throw Error(`${propertyName} was not found as en environment variable.`);
+	private async GET<T>(fn: () => Promise<T>): Promise<T> {
+		if (this.remainingAPICalls === 0) {
+			throw new APILimitReachedException();
 		}
-		return property;
+
+		try {
+			const response = await fn();
+			this.remainingAPICalls--;
+			return response;
+		} catch (error) {
+			this.exceptionMapper(error);
+		}
 	}
 
-	private exceptionMapper(error: AxiosError<UntappdApiError>): never {
-		const untappdErrorMetaData = error.response?.data?.meta;
-		const errorMessage = untappdErrorMetaData?.error_detail ?? error?.message;
-		switch (error.response?.status) {
+	private exceptionMapper(error: Error): never {
+		const statusCode = error instanceof HTTPException ? error.statusCode : 500;
+		switch (statusCode) {
 			case 400:
-				throw new BadRequestException(errorMessage, error?.message);
+				throw new BadRequestException(error.message);
 			case 401:
-				throw new UnauthorizedException(errorMessage, error?.message);
+				throw new UnauthorizedException(error.message);
 			case 403:
-				throw new ForbiddenException(errorMessage, error?.message);
+				throw new ForbiddenException(error.message);
 			case 404:
-				throw new NotFoundException(errorMessage, error?.message);
+				throw new NotFoundException(error.message);
 			case 429: {
-				const remainingApiCalls =
-					error.response?.headers[X_RATELIMIT_REMAINING_HEADER];
-				if (
-					(remainingApiCalls && remainingApiCalls === 0) ||
-					remainingApiCalls === '0'
-				) {
-					throw new APILimitReachedException();
-				}
 				throw new TooManyRequestsException();
 			}
 			default:
-				throw new InternalServerErrorException(errorMessage, error?.message);
+				throw new InternalServerErrorException(error.message);
 		}
+	}
+
+	@Cron(CronExpression.EVERY_HOUR)
+	private resetRemainingAPICalls() {
+		this.logger.log('Resetting remaining API calls back to 100');
+		this.remainingAPICalls = 100;
 	}
 }

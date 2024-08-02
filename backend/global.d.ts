@@ -18,7 +18,6 @@ declare global {
 		interface ExpectExtendMap {
 			toMatchProduct: MatcherFunction<[actualProduct: VinmonopoletProduct]>;
 			toBeWithinSecondsOfDate: MatcherFunction<[recievedDate: Date]>;
-			toMatchUser: MatcherFunction<[actualUser: User]>;
 			toMatchStock: MatcherFunction<[actualStock: Stock[]]>;
 			toEqualDateIgnoringTime: MatcherFunction<[recievedDate: Date]>;
 		}

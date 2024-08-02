@@ -9,10 +9,4 @@ import { UntappdClient } from './untappdClient';
 	providers: [UntappdService, UntappdClient],
 	exports: [UntappdService],
 })
-export class UntappdModule implements OnModuleInit {
-	constructor(private untappdService: UntappdService) {}
-
-	async onModuleInit() {
-		// this.untappdService.search('Mikkeller Blow Out')
-	}
-}
+export class UntappdModule {}

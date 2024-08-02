@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
-import { UsersModule } from '@modules/users/users.module';
 import { AdminService } from './admin.service';
 import { BullModule } from '@nestjs/bull';
 import {
@@ -17,7 +16,6 @@ import { BannerModule } from '@modules/banner/banner.module';
 	imports: [
 		JwtModule,
 		ConfigModule,
-		UsersModule,
 		ProductsModule,
 		BullModule.registerQueue({
 			name: 'user',

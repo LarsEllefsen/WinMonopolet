@@ -7,7 +7,6 @@ import { UntappdModule } from '@modules/untappd/untappd.module';
 import { VinmonopoletModule } from '@modules/vinmonopolet/vinmonopolet.module';
 import { WordlistModule } from '@modules/wordlist/wordlist.module';
 import { SchedulerService } from '@modules/scheduler/scheduler.service';
-import { UsersModule } from '@modules/users/users.module';
 import { BullModule } from '@nestjs/bull';
 import { MailModule } from '@modules/mail/mail.module';
 import { AdminModule } from '@modules/admin/admin.module';
@@ -32,7 +31,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 		UntappdModule,
 		VinmonopoletModule,
 		WordlistModule,
-		UsersModule,
 		MailModule,
 		AdminModule,
 		ReleasesModule,
