@@ -9,7 +9,7 @@ const dateIsWithinAllowedOffsetOfEachother = (
 
 	const diff = Math.abs(a.getTime() - b.getTime());
 
-	return diff < allowedOffset;
+	return diff <= allowedOffset;
 };
 
 const toBeWithinSecondsOfDate: MatcherFunction<
