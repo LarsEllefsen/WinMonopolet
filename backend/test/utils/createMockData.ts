@@ -9,7 +9,6 @@ import { UntappdSearchResultDTO } from '@modules/untappd/dto/UntappdSearchResult
 import { UntappdProductDTO } from '@modules/untappd/dto/UntappdProductDTO';
 import { Word } from '@modules/wordlist/entities/word';
 import { GetBeerInfoResponseDTO } from '@modules/untappd/dto/GetBeerInfoResponseDTO';
-import { User } from '@modules/users/entities/user.entity';
 import { randomBytes } from 'crypto';
 import { UntappdUserProductDTO } from '@modules/untappd/dto/UntappdUserProductDTO';
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
@@ -388,44 +387,6 @@ export const createMockVinmonopoletProductWithStockLevel = ({
 			untappd,
 		),
 	} as VinmonopoletProductWithStockLevel;
-};
-
-type CreateMockUser = {
-	accessToken?: string;
-	salt?: Buffer;
-	id?: string;
-	firstName?: string;
-	lastName?: string;
-	userName?: string;
-	userAvatar?: string;
-	userAvatarHD?: string;
-	totalBeers?: number;
-	created?: Date;
-	updated?: Date;
-};
-
-export const createMockUser = ({
-	accessToken = 'token',
-	id = '231093',
-	firstName = 'Ola',
-	userName = 'OlaNordmannDrinksBeer',
-	userAvatar = 'https://assets.untappd.com/profile/56aafdb534904b3b75b1542a9e9c0db4_300x300.jpg',
-	userAvatarHD = 'https://assets.untappd.com/profile/56aafdb534904b3b75b1542a9e9c0db4_300x300_HD.jpg',
-	salt = randomBytes(16),
-	created = new Date(),
-	updated = new Date(),
-}: CreateMockUser) => {
-	return new User(
-		id,
-		userName,
-		userAvatar,
-		userAvatarHD,
-		firstName,
-		accessToken,
-		salt,
-		created,
-		updated,
-	);
 };
 
 export const createMockUntappdUserProductDTO = () => {

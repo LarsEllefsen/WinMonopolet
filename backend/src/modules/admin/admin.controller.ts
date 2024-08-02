@@ -5,6 +5,7 @@ import {
 	Delete,
 	Get,
 	HttpCode,
+	NotImplementedException,
 	Param,
 	Post,
 	Put,
@@ -27,12 +28,16 @@ export class AdminController {
 
 	@Get('/users')
 	getAllUsers() {
-		return this.adminService.getAllUsers();
+		throw new NotImplementedException(
+			'This endpoint is deprecated and to be deleted.',
+		);
 	}
 
 	@Get('/users/:user_id')
 	async getUser(@Param('user_id') userId: string) {
-		return this.adminService.getUserById(userId);
+		throw new NotImplementedException(
+			'This endpoint is deprecated and to be deleted.',
+		);
 	}
 
 	@Get('/queue/user')

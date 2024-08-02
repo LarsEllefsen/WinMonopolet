@@ -1,35 +1,20 @@
 import { BannerService } from '@modules/banner/banner.service';
 import { BannerColor } from '@modules/banner/entities/banner.entity';
 import { ProductsService } from '@modules/products/products.service';
-import { UsersService } from '@modules/users/users.service';
 import { InjectQueue } from '@nestjs/bull';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JobStatus, Queue } from 'bull';
 import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AdminService {
 	constructor(
-		private readonly usersService: UsersService,
 		private readonly productsService: ProductsService,
 		private readonly bannerService: BannerService,
 		@InjectQueue('user') private userQueue: Queue,
 		@Inject(CACHE_MANAGER) private cache: Cache,
 	) {}
-
-	getAllUsers() {
-		return this.usersService.getAllUsers();
-	}
-
-	async getUserById(userId: string) {
-		const user = await this.usersService.getUser(userId);
-		if (!user) {
-			throw new NotFoundException(`No user with id ${userId} found.`);
-		}
-
-		return user;
-	}
 
 	async getUsersInQueueWithStatus(status: JobStatus) {
 		const jobs = await this.getAllJobsWithStatus(status);

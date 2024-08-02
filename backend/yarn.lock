@@ -4603,6 +4603,33 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+jsdom@^24.1.1:
+  version "24.1.1"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-24.1.1.tgz#f41df8f4f3b2fbfa7e1bdc5df62c9804fd14a9d0"
+  integrity sha512-5O1wWV99Jhq4DV7rCLIoZ/UIhyQeDR7wHVyZAHAshbrvZsLs+Xzz7gtwnlJTJDjleiTKh54F4dXrX70vJQTyJQ==
+  dependencies:
+    cssstyle "^4.0.1"
+    data-urls "^5.0.0"
+    decimal.js "^10.4.3"
+    form-data "^4.0.0"
+    html-encoding-sniffer "^4.0.0"
+    http-proxy-agent "^7.0.2"
+    https-proxy-agent "^7.0.5"
+    is-potential-custom-element-name "^1.0.1"
+    nwsapi "^2.2.12"
+    parse5 "^7.1.2"
+    rrweb-cssom "^0.7.1"
+    saxes "^6.0.0"
+    symbol-tree "^3.2.4"
+    tough-cookie "^4.1.4"
+    w3c-xmlserializer "^5.0.0"
+    webidl-conversions "^7.0.0"
+    whatwg-encoding "^3.1.1"
+    whatwg-mimetype "^4.0.0"
+    whatwg-url "^14.0.0"
+    ws "^8.18.0"
+    xml-name-validator "^5.0.0"
+
 jsdom@^25.0.0:
   version "25.0.0"
   resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-25.0.0.tgz#d1612b4ddab85af56821b2f731e15faae135f4e1"
@@ -6750,6 +6777,13 @@ unpipe@1.0.0, unpipe@~1.0.0:
   resolved "https://registry.npmjs.org/unpipe/-/unpipe-1.0.0.tgz"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
 
+untappd-node@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/untappd-node/-/untappd-node-1.0.5.tgz#aa5c24945bb7298da555c9b25ad07d12459237aa"
+  integrity sha512-C9auUVY9fDnaKWxaTOHJIh1EKSCKIw0iikG/ImiAcK6AipB0UR4daY5QNN1ocghD6maLjl8uqCZt89pS90vmSg==
+  dependencies:
+    jsdom "^24.1.1"
+
 update-browserslist-db@^1.0.10:
   version "1.0.10"
   resolved "https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.0.10.tgz"
@@ -6835,10 +6869,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vinmonopolet-ts@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-5.0.1.tgz#bd85da63b5dca5c560362f97fa21ebd151d96e9b"
-  integrity sha512-l5sGEh0ryrwCguUHinMXUt+m5oG0HjM4ZDrwUVIXWh3rOasGGy9RDn6vvXyFT5FGrk3GJTwVckQgj18l8JkXnA==
+vinmonopolet-ts@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-5.0.0.tgz#de2308b51ef42196c0fe9045fd718b3ffca3d3be"
+  integrity sha512-sy0UWfhGx0rurd2LWqKApN/raOFUu39uEKv0SKKj2HLCm+nxj26hLdbIlru3RzLzdvR70x82o3DO7gtso+9t6A==
   dependencies:
     class-transformer "^0.5.1"
     class-validator "^0.14.0"

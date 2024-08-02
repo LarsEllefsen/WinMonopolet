@@ -1,23 +1,20 @@
 import { mapToUntappdProduct } from '@modules/untappd/mapper';
-import {
-	createMockUntappdProductDTO,
-	createMockVinmonopoletProduct,
-} from 'test/utils/createMockData';
+import { Beer } from 'untappd-node';
 
 describe('productMapper', () => {
 	it('should map untappd dto to UntappdProduct', () => {
 		const vmp_id = '12345678';
-		const mockUntappdProductDTO = createMockUntappdProductDTO({
-			beer_name: 'Winmonopolet Barrel Aged Imperial Stout',
-			brewery_name: 'Lars Brewing',
-			beer_abv: 16.5,
-			bid: 1234,
-			beer_style: 'Stout - Imperial / Double',
-			rating_count: 69,
-			rating_score: 4.55,
-			beer_slug: 'lars-brewing-winmonopolet-barrel-aged-imperial-stout',
-			beer_label: 'https://picture.com/beer.png',
-		});
+		const mockUntappdProductDTO = {
+			name: 'Winmonopolet Barrel Aged Imperial Stout',
+			brewery: 'Lars Brewing',
+			abv: 16.5,
+			id: '1234',
+			style: 'Stout - Imperial / Double',
+			numRatings: 69,
+			rating: 4.55,
+			image: 'https://picture.com/beer.png',
+			url: 'https://untappd.com/b/lars-brewing-winmonopolet-barrel-aged-imperial-stout/1234',
+		} satisfies Beer;
 
 		const untappProduct = mapToUntappdProduct(mockUntappdProductDTO, vmp_id);
 

@@ -201,7 +201,7 @@ describe('productRepository', () => {
 			);
 			expect(addedDateWhenInserted).toEqual(addedDateWhenUpdated);
 			expect(lastUpdatedWhenUpdated).not.toEqual(addedDateWhenUpdated);
-			expect(lastUpdatedWhenInserted).toBeAfter(addedDateWhenUpdated as Date);
+			expect(lastUpdatedWhenUpdated).toBeAfter(lastUpdatedWhenInserted as Date);
 		});
 	});
 
