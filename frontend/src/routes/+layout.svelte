@@ -69,20 +69,6 @@
 
 		<div class="flex md:gap-x-8 gap-x-6 items-center">
 			<div class="">
-				<UserContextMenu
-					open={menuState.userContextMenuOpen}
-					on:click={() => toggleMenu('userContextMenuOpen')}
-				/>
-			</div>
-			{#if $page.data.isAuthenticated}
-				<div class="">
-					<FavoritedStores
-						open={menuState.favoriteStoresOpen}
-						on:click={() => toggleMenu('favoriteStoresOpen')}
-					/>
-				</div>
-			{/if}
-			<div class="">
 				<SearchStores
 					searchIsActive={menuState.searchIsActive}
 					on:focus={() => toggleMenu('searchIsActive')}

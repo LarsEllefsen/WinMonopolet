@@ -63,4 +63,4 @@ const authorization: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle = sequence(handleExpectedErrors, authorization);
+export const handle = sequence(handleExpectedErrors);

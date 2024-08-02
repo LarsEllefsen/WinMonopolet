@@ -1,35 +1,10 @@
-import { getUserProducts } from '$lib/server/user/getUserProducts';
 import { env } from '$env/dynamic/private';
-import type { UserProduct } from '../../../types/product';
-import type { Stock } from '../../../types/stock';
 import { POST } from '$lib/server/POST';
 import { getStock } from '$lib/server/stores/getStock';
 
-const mapToProductWithUserInformation = (stock: Stock, userProducts: UserProduct[]) => {
-	const userProduct = userProducts.find(
-		(userProduct) => userProduct.untappdId == stock.product.untappd.untappd_id
-	);
-	if (userProduct) {
-		stock.product.has_had = true;
-		stock.product.user_score = userProduct.userScore;
-	}
-	return stock;
-};
-
-const getStockWithUserInformation = (stock: Stock[], userProducts: UserProduct[]) => {
-	return stock.map((stock) => mapToProductWithUserInformation(stock, userProducts));
-};
-
-export async function load({ params, locals }) {
-	let stock = await getStock(params.store_id);
-	if (locals.session?.token) {
-		const userProducts = await getUserProducts(locals.session.token);
-
-		stock = getStockWithUserInformation(stock, userProducts);
-	}
-
+export async function load({ params }) {
 	return {
-		stock
+		stock: getStock(params.store_id)
 	};
 }
 
