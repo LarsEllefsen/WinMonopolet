@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from '@modules/products/products.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { BannerModule } from '@modules/banner/banner.module';
 
 @Module({
 	imports: [
@@ -28,6 +29,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 			},
 		}),
 		CacheModule.register(),
+		BannerModule,
 	],
 	controllers: [AdminController],
 	providers: [AdminService],

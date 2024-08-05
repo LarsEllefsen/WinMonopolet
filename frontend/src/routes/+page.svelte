@@ -15,14 +15,13 @@
 			<img class="lg:w-3/4 w-full mx-auto" src="/images/logo.svg" alt="Winmonopolet logo" />
 
 			<div class="grid grid-cols-12 lg:my-20 mt-12 mb-12">
-				<div class="md:col-span-full col-span-full lg:mb-12 mb-8">
-					<Banner>
-						Det er for tiden problemer med apiet til Untappd. Frem til problemet er fikset vil ikke
-						innlogging fungere, nye produkter i vinmonopolet sortiment vil ikke vises og
-						eksisterende ratinger vil ikke bli oppdatert. <br /> <br />Beklager ulempen, det jobbes
-						med saken!
-					</Banner>
-				</div>
+				{#if data.banner}
+					<div class="md:col-span-full col-span-full lg:mb-12 mb-8">
+						<Banner color={data.banner.color}>
+							{@html data.banner?.text}
+						</Banner>
+					</div>
+				{/if}
 
 				<div class="md:col-span-8 col-span-full">
 					<p class="text-xl mb-8">

@@ -1,10 +1,13 @@
 import {
+	Body,
 	ClassSerializerInterceptor,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	Param,
 	Post,
+	Put,
 	Query,
 	UseGuards,
 	UseInterceptors,
@@ -14,6 +17,7 @@ import { ParseJobStatus } from '@common/pipes/parseJobStatus.pipe';
 import { JobStatus } from 'bull';
 import { AdminGuard } from '@common/guards/admin.guard';
 import { mapJobToQueueJobDTO } from './mapper';
+import { CreateBannerDTO } from './dto/CreateBannerDTO';
 
 @Controller('admin')
 @UseGuards(AdminGuard)
@@ -42,5 +46,29 @@ export class AdminController {
 	@HttpCode(204)
 	triggerFindAndSaveAnyUpcomingProducts() {
 		this.adminService.findAndSaveAnyUpcomingProducts();
+	}
+
+	@Post('/banner')
+	@HttpCode(204)
+	async createBanner(@Body() createBannerDTO: CreateBannerDTO) {
+		await this.adminService.createBanner(
+			createBannerDTO.text,
+			createBannerDTO.color,
+		);
+	}
+
+	@Delete('/banner')
+	@HttpCode(204)
+	async deleteBanner() {
+		await this.adminService.deleteBanner();
+	}
+
+	@Put('/banner')
+	@HttpCode(200)
+	updateBanner(@Body() createBannerDTO: CreateBannerDTO) {
+		return this.adminService.updateBanner(
+			createBannerDTO.text,
+			createBannerDTO.color,
+		);
 	}
 }

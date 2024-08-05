@@ -1,3 +1,5 @@
+import { BannerService } from '@modules/banner/banner.service';
+import { BannerColor } from '@modules/banner/entities/banner.entity';
 import { ProductsService } from '@modules/products/products.service';
 import { UsersService } from '@modules/users/users.service';
 import { InjectQueue } from '@nestjs/bull';
@@ -11,6 +13,7 @@ export class AdminService {
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly productsService: ProductsService,
+		private readonly bannerService: BannerService,
 		@InjectQueue('user') private userQueue: Queue,
 		@Inject(CACHE_MANAGER) private cache: Cache,
 	) {}
@@ -36,6 +39,18 @@ export class AdminService {
 	async findAndSaveAnyUpcomingProducts() {
 		await this.productsService.findAndSaveAnyUpcomingProducts();
 		await this.cache.reset();
+	}
+
+	async createBanner(text: string, color: BannerColor) {
+		await this.bannerService.createBanner(text, color);
+	}
+
+	updateBanner(text: string, color: BannerColor) {
+		return this.bannerService.updateBanner(text, color);
+	}
+
+	async deleteBanner() {
+		await this.bannerService.deleteBanner();
 	}
 
 	private getAllJobsWithStatus(status: JobStatus) {
