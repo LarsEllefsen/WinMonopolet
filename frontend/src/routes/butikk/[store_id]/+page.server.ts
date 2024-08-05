@@ -1,9 +1,9 @@
-import { GET } from '$lib/server/GET';
 import { getUserProducts } from '$lib/server/user/getUserProducts';
 import { env } from '$env/dynamic/private';
 import type { UserProduct } from '../../../types/product';
 import type { Stock } from '../../../types/stock';
 import { POST } from '$lib/server/POST';
+import { getStock } from '$lib/server/stores/getStock';
 
 const mapToProductWithUserInformation = (stock: Stock, userProducts: UserProduct[]) => {
 	const userProduct = userProducts.find(
@@ -21,7 +21,7 @@ const getStockWithUserInformation = (stock: Stock[], userProducts: UserProduct[]
 };
 
 export async function load({ params, locals }) {
-	let stock = await GET<Stock[]>(`${env.API_URL}/api/stores/${params.store_id}/products`);
+	let stock = await getStock(params.store_id);
 	if (locals.session?.token) {
 		const userProducts = await getUserProducts(locals.session.token);
 

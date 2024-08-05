@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { APIError } from './APIError';
 import { authorizationHeader } from './authorizationHeader';
 import type { SessionToken } from './session/sessionToken';
 
@@ -8,7 +8,7 @@ import type { SessionToken } from './session/sessionToken';
  * @param accessToken
  * @returns
  */
-export const GET = async <T>(url: string, sessionToken?: SessionToken): Promise<T> => {
+export const GET = async <T>(url: string, sessionToken?: SessionToken): Promise<T | APIError> => {
 	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
@@ -18,7 +18,7 @@ export const GET = async <T>(url: string, sessionToken?: SessionToken): Promise<
 	});
 
 	if (!response.ok) {
-		throw error(response.status, { message: response.statusText });
+		return new APIError(response.status, response.statusText);
 	}
 
 	const data = await response.json();

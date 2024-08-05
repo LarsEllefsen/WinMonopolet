@@ -1,9 +1,8 @@
-import { GET } from '$lib/server/GET';
-import type { SessionToken } from '$lib/server/session/sessionToken';
+import { getReleases } from '$lib/server/releases/getReleases';
+import { SessionToken } from '$lib/server/session/sessionToken';
+import { getStores } from '$lib/server/stores/getStores';
 import { getFavoriteStores } from '$lib/server/user/favoriteStores/getFavoriteStores';
-import { env } from '$env/dynamic/private';
-import type { Store } from '../types/store';
-import type { Releases, ReleasesDTO } from '../types/releases';
+import { Store } from '../types/store';
 
 const getStoresWithFavorites = async (stores: Store[], token: SessionToken) => {
 	const userFavoriteStores = await getFavoriteStores(token);
@@ -14,30 +13,15 @@ const getStoresWithFavorites = async (stores: Store[], token: SessionToken) => {
 	return stores;
 };
 
-const getStores = async (sessionToken?: SessionToken) => {
-	let stores = await GET<Store[]>(`${env.API_URL}/api/stores`);
-	if (sessionToken) {
-		stores = await getStoresWithFavorites(stores, sessionToken);
+export async function load({ locals }) {
+	let stores = await getStores();
+	if (locals.session?.token) {
+		stores = await getStoresWithFavorites(stores, locals.session.token);
 	}
 
-	return stores;
-};
-
-const getReleases = async () => {
-	const releasesDTO = await GET<ReleasesDTO>(`${env.API_URL}/api/releases`);
-
-	return {
-		upcomingReleases: releasesDTO.upcomingReleases.map((x) => new Date(x)),
-		previousReleases: releasesDTO.previousReleases.map((x) => new Date(x))
-	} satisfies Releases;
-};
-
-export async function load({ locals }) {
-	const stores = await getStores(locals.session?.token);
-	const releases = await getReleases();
 	return {
 		stores,
-		releases,
+		releases: await getReleases(),
 		user: locals.session?.user,
 		isAuthenticated: locals.session !== undefined ? true : false
 	};
