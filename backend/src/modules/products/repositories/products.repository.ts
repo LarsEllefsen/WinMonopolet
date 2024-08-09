@@ -322,7 +322,7 @@ export class ProductsRepository {
 
 		if (searchQuery !== undefined) {
 			queryList.push(hasMultipleWhereClauses ? 'AND' : 'WHERE');
-			queryList.push(`vp.vmp_name LIKE $1`);
+			queryList.push(`LOWER(vp.vmp_name) LIKE LOWER($1)`);
 			parameters.push(`%${searchQuery}%`);
 		}
 
