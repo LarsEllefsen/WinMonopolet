@@ -48,6 +48,12 @@ export class AdminController {
 		this.adminService.findAndSaveAnyUpcomingProducts();
 	}
 
+	@Post('/scheduler/save-all-vinmonopolet-products')
+	@HttpCode(204)
+	triggerSaveAllVinmonopoletProducts() {
+		this.adminService.saveAllVinmonopoletProducts();
+	}
+
 	@Post('/banner')
 	@HttpCode(204)
 	async createBanner(@Body() createBannerDTO: CreateBannerDTO) {

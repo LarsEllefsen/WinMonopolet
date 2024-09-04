@@ -223,7 +223,7 @@ export class ProductsService {
 	 * Gets all products from Vinmonopolet and either updates the existing product or inserts it as a new product.
 	 * If the product does not have a corresponding untappd product it tries to find a matching product and insert it into the database.
 	 */
-	async insertOrUpdateAllVinmonopoletProducts() {
+	async saveAllVinmonopoletProducts() {
 		const statCollector = new ProductsStatCollector();
 		let getUntappdProducts = true;
 

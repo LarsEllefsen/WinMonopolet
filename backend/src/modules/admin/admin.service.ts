@@ -41,6 +41,10 @@ export class AdminService {
 		await this.cache.reset();
 	}
 
+	saveAllVinmonopoletProducts() {
+		this.productsService.saveAllVinmonopoletProducts();
+	}
+
 	async createBanner(text: string, color: BannerColor) {
 		await this.bannerService.createBanner(text, color);
 	}

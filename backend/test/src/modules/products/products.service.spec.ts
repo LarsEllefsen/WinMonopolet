@@ -284,7 +284,7 @@ describe('productsService', () => {
 					return Promise.resolve(false);
 				});
 
-			await productsService.insertOrUpdateAllVinmonopoletProducts();
+			await productsService.saveAllVinmonopoletProducts();
 
 			expect(getAllProductsSpy).toHaveBeenCalledTimes(productCategories.length);
 			expect(saveProductSpy).toHaveBeenCalledTimes(
@@ -321,7 +321,7 @@ describe('productsService', () => {
 				'saveUntappdProduct',
 			);
 
-			await productsService.insertOrUpdateAllVinmonopoletProducts();
+			await productsService.saveAllVinmonopoletProducts();
 
 			expect(saveProductSpy).toHaveBeenCalledTimes(
 				mockProductsToReturn.length * productCategories.length,
@@ -353,7 +353,7 @@ describe('productsService', () => {
 				});
 			const saveProductSpy = jest.spyOn(productRepository, 'saveProduct');
 
-			await productsService.insertOrUpdateAllVinmonopoletProducts();
+			await productsService.saveAllVinmonopoletProducts();
 
 			expect(tryToFindMatchingUntappdProductSpy).toHaveBeenCalledTimes(2);
 			expect(saveProductSpy).toHaveBeenCalledTimes(
