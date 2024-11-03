@@ -63,6 +63,11 @@ export class ProductsController {
 		);
 	}
 
+	@Get(':vmp_id')
+	getVinmonopoletProduct(@Param('vmp_id') productId: string) {
+		return this.productsService.getProduct(productId);
+	}
+
 	@Post(':vmp_id/untappd')
 	createUntappdProductFromId(
 		@Param('vmp_id') vmp_id: string,

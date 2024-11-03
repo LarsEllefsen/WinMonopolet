@@ -51,6 +51,29 @@ describe('productsService', () => {
 		upcomingProductRepository = unitRef.get(UpcomingProductRepository);
 	});
 
+	describe('getProduct', () => {
+		it('should get product by id', async () => {
+			jest
+				.spyOn(productRepository, 'getProductById')
+				.mockResolvedValue(mockUpcomingVinmonopoletProduct1);
+
+			const product = await productsService.getProduct(
+				mockUpcomingVinmonopoletProduct1.vmp_id,
+			);
+
+			expect(product).not.toBeNull;
+			expect(product).toMatchProduct(mockUpcomingVinmonopoletProduct1);
+		});
+
+		it('should throw NotFound exception if no product was found', async () => {
+			jest.spyOn(productRepository, 'getProductById').mockResolvedValue(null);
+
+			await expect(
+				productsService.getProduct(mockUpcomingVinmonopoletProduct1.vmp_id),
+			).rejects.toThrow();
+		});
+	});
+
 	describe('updateUntappdProductsWithScoreOfZero', () => {
 		it('should update all the products retrieved from the database', async () => {
 			jest

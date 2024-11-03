@@ -44,6 +44,14 @@ export class ProductsService {
 		'^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[012])[.](19|20)[0-9]{2}$',
 	);
 
+	async getProduct(productId: string) {
+		const product = await this.productsRepository.getProductById(productId);
+		if (product === null) {
+			throw new NotFoundException(`No product with id ${productId} found.`);
+		}
+		return product;
+	}
+
 	async getProducts(
 		query?: string,
 		hasUntappdProduct?: boolean,
