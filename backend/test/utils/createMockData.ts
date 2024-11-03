@@ -9,9 +9,10 @@ import { UntappdSearchResultDTO } from '@modules/untappd/dto/UntappdSearchResult
 import { UntappdProductDTO } from '@modules/untappd/dto/UntappdProductDTO';
 import { Word } from '@modules/wordlist/entities/word';
 import { GetBeerInfoResponseDTO } from '@modules/untappd/dto/GetBeerInfoResponseDTO';
-import { randomBytes } from 'crypto';
 import { UntappdUserProductDTO } from '@modules/untappd/dto/UntappdUserProductDTO';
 import { VinmonopoletProductWithStockLevel } from '@modules/vinmonopolet/vinmonopolet.interface';
+import Category from 'vinmonopolet-ts/dist/types/models/Category';
+import { IAvailability } from 'vinmonopolet-ts/dist/types/models/Availability';
 
 const test_store_id = '160';
 
@@ -160,9 +161,13 @@ export const createMockVinmonopoletProductDTO = ({
 	code = '14962702',
 	name = 'Lervig Paragon Bourbon Barrel 2021',
 	url = 'https://www.vinmonopolet.no/Land/Norge/Rogaland/Stavanger/Lervig-Paragon-Bourbon-Barrel-2021/p/14962702',
-	mainCategory = { name: 'Øl' },
-	mainCountry = { name: 'Norge' },
-	mainSubCategory = { name: 'Barley Wine' },
+	mainCategory = { name: 'Øl', code: 'Øl', url: '' } satisfies Category,
+	mainCountry = { name: 'Norge', code: 'Norge', url: '' },
+	mainSubCategory = {
+		name: 'Barley Wine',
+		code: 'Barley Wine',
+		url: '',
+	} satisfies Category,
 	district = { name: null, code: null, url: null },
 	price = 224.7,
 	pricePerLiter = 739,
@@ -175,47 +180,50 @@ export const createMockVinmonopoletProductDTO = ({
 		},
 	],
 	productSelection = 'Tilleggsutvalget',
-	productType = 'Øl',
 	volume = {
 		value: 37.5,
 		formattedValue: '37,5cl',
 		unit: 'cl',
 	},
 }) => {
-	const baseProduct = new BaseProduct({ code: code });
-
-	baseProduct.name = name;
-	baseProduct.url = url;
-	baseProduct.mainCategory = { ...mainCategory, ...{ code: null, url: null } };
-	baseProduct.mainSubCategory = {
-		...mainSubCategory,
-		...{ code: null, url: null },
-	};
-	baseProduct.mainCountry = { ...mainCountry, ...{ code: null, url: null } };
-	baseProduct.price = price;
-	baseProduct.pricePerLiter = pricePerLiter;
-	baseProduct.images = images;
-	baseProduct.productSelection = productSelection;
-	baseProduct.productType = productType;
-	baseProduct.volume = volume;
-	baseProduct.district = district;
-	baseProduct.subDistrict = district;
-	baseProduct.productAvailability = {
+	const availability = {
 		deliveryAvailability: {
 			availableForPurchase: true,
 			infos: [
-				{ availability: '15 stk på lager', readableValue: '15 stk på lager' },
+				{
+					availability: '15 stk på lager',
+					readableValue: '15 stk på lager',
+				},
 			],
 		},
 		storesAvailability: {
 			availableForPurchase: true,
 			infos: [
-				{ availability: '15 stk på lager', readableValue: '15 stk på lager' },
+				{
+					availability: '15 stk på lager',
+					readableValue: '15 stk på lager',
+				},
 			],
 		},
-	};
-	baseProduct.buyable = true;
-	baseProduct.status = '';
+	} satisfies IAvailability;
+	const baseProduct = new BaseProduct(
+		code,
+		name,
+		url,
+		price,
+		pricePerLiter,
+		images,
+		volume,
+		mainCategory,
+		mainSubCategory,
+		mainCountry,
+		district,
+		district,
+		productSelection,
+		availability,
+		true,
+		'',
+	);
 
 	return baseProduct;
 };

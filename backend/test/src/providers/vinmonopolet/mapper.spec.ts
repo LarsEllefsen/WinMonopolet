@@ -6,12 +6,15 @@ describe('productMapper', () => {
 		const vinmonopoletProductDTO = createMockVinmonopoletProductDTO({
 			code: '231093',
 			name: 'Nøgne Ø Imperial Stout',
-			mainCategory: { name: 'Øl' },
-			mainCountry: { name: 'Norge' },
-			mainSubCategory: { name: 'Porter & Stout' },
+			mainCategory: { name: 'Øl', code: 'Øl', url: '' },
+			mainCountry: { name: 'Norge', code: 'Norge', url: '' },
+			mainSubCategory: {
+				name: 'Porter & Stout',
+				code: 'Porter & Stout',
+				url: '',
+			},
 			price: 69.9,
 			productSelection: 'Basisutvalget',
-			productType: 'Øl',
 			url: 'www.vinmonopolet.no/test/url',
 			volume: { formattedValue: '33cl', unit: 'cl', value: 33 },
 		});

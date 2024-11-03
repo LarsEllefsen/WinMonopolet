@@ -45,7 +45,7 @@ export const mapToVinmonopoletProduct = (
 		vinmonopoletProductDTO.url,
 		vinmonopoletProductDTO.price,
 		vinmonopoletProductDTO.mainCategory.name as string,
-		vinmonopoletProductDTO.mainSubCategory.name ?? null,
+		vinmonopoletProductDTO.mainSubCategory?.name ?? null,
 		vinmonopoletProductDTO.productSelection,
 		vinmonopoletProductDTO.volume.formattedValue,
 		vinmonopoletProductDTO.mainCountry.name as string,
@@ -63,7 +63,11 @@ export const mapToVinmonopoletProductWithStockLevel = (
 ): VinmonopoletProductWithStockLevel => {
 	const storeAvailability =
 		vinmonopoletProductDTO?.productAvailability?.storesAvailability;
-	if (storeAvailability.infos.length === 0) {
+	if (
+		storeAvailability?.infos.length === 0 ||
+		vinmonopoletProductDTO?.productAvailability?.storesAvailability?.infos[0]
+			.availability === undefined
+	) {
 		throw new Error(
 			`Unable to get stock level for product ${vinmonopoletProductDTO.code}, missing availability info.`,
 		);
