@@ -11,6 +11,23 @@
 	export let index: number;
 
 	const dispatch = createEventDispatcher();
+
+	const getFullVinmonopoletUrl = (url: string) => {
+		if (
+			url.startsWith('https://www.vinmonopolet.no') ||
+			url.startsWith('https://vinmonopolet.no')
+		) {
+			return url;
+		}
+
+		if (url.startsWith('/')) {
+			return 'https://www.vinmonopolet.no' + url;
+		}
+
+		return 'https://www.vinmonopolet.no/' + url;
+	};
+
+	$: vinmonopoletUrl = getFullVinmonopoletUrl(stock.product.vmp_url);
 </script>
 
 <div
@@ -93,7 +110,7 @@
 				class="inline-flex items-center gap-x-2 p-2 border-slate-500 rounded-md vinmonopolet-link-button"
 				target="_blank"
 				rel="noopener noreferrer"
-				href={`www.vinmonopolet.no${stock.product.vmp_url}`}
+				href={vinmonopoletUrl}
 			>
 				<VinmonopoletIcon class="stroke-2 w-5 h-5" />
 			</a>
