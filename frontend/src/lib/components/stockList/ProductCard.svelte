@@ -93,7 +93,7 @@
 				class="inline-flex items-center gap-x-2 p-2 border-slate-500 rounded-md vinmonopolet-link-button"
 				target="_blank"
 				rel="noopener noreferrer"
-				href={stock.product.vmp_url}
+				href={`www.vinmonopolet.no${stock.product.vmp_url}`}
 			>
 				<VinmonopoletIcon class="stroke-2 w-5 h-5" />
 			</a>
