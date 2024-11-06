@@ -83,7 +83,7 @@ export class VinmonopoletService {
 		const validationErrors = await validate(baseProduct);
 		if (validationErrors.length > 0) {
 			throw new Error(
-				'Validation of vinmonopolet baseProduct failed: ' + validationErrors,
+				`Validation of vinmonopolet baseProduct ${baseProduct.code} (${baseProduct.name}) failed: ${validationErrors}`,
 			);
 		}
 	}
