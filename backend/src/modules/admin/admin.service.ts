@@ -3,12 +3,14 @@ import { BannerColor } from '@modules/banner/entities/banner.entity';
 import { ProductsService } from '@modules/products/products.service';
 import { InjectQueue } from '@nestjs/bull';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JobStatus, Queue } from 'bull';
 import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AdminService {
+	private readonly logger = new Logger(AdminService.name);
+
 	constructor(
 		private readonly productsService: ProductsService,
 		private readonly bannerService: BannerService,
@@ -22,11 +24,17 @@ export class AdminService {
 	}
 
 	async findAndSaveAnyUpcomingProducts() {
+		this.logger.log(
+			'Manually started scheduled task findAndSaveAnyUpcomingProducts ',
+		);
 		await this.productsService.findAndSaveAnyUpcomingProducts();
 		await this.cache.reset();
 	}
 
 	saveAllVinmonopoletProducts() {
+		this.logger.log(
+			'Manually started scheduled task saveAllVinmonopoletProducts ',
+		);
 		this.productsService.saveAllVinmonopoletProducts();
 	}
 
