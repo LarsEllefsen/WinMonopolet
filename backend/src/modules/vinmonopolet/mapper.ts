@@ -46,7 +46,7 @@ export const mapToVinmonopoletProduct = (
 		vinmonopoletProductDTO.price,
 		vinmonopoletProductDTO.mainCategory?.name ?? '',
 		vinmonopoletProductDTO.mainSubCategory?.name ?? null,
-		vinmonopoletProductDTO.productSelection,
+		vinmonopoletProductDTO.productSelection ?? '',
 		vinmonopoletProductDTO.volume?.formattedValue ?? '',
 		vinmonopoletProductDTO.mainCountry?.name ?? '',
 		undefined,
