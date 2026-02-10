@@ -6832,10 +6832,10 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-vinmonopolet-ts@5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-5.2.3.tgz#59babd9b5273d5371877e552c39ef2b9a294013d"
-  integrity sha512-ak4Tp7dNoxedhcxEIMaCizsc/fm2tiQvg4k5DScpMCr7VkUhAVd8yzkG6p5Cgi56zGNCZW+uoLkbZt16G58w0g==
+vinmonopolet-ts@^5.2.8:
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/vinmonopolet-ts/-/vinmonopolet-ts-5.2.8.tgz#03653a32010ec64b33609f7a06baa46461ca3fca"
+  integrity sha512-Tslx9vD+QUz1dZmpOcJcawrrg9kEFQCH8MXoIL7f6T6HYkfqDUBUOet3SquVRchRE8MSIbHdktrH/hzNDPEpRQ==
   dependencies:
     class-transformer "^0.5.1"
     class-validator "^0.14.0"
