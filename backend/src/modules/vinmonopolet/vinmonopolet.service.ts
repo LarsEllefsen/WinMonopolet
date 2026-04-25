@@ -26,10 +26,10 @@ export class VinmonopoletService {
 		let currentPage = 1;
 		let totalPages = 2;
 		while (currentPage <= totalPages) {
-			const { pagination, products } = await getProducts({
-				facets,
-				page: currentPage,
-			});
+			const { pagination, products } = await delayExecution(
+				() => getProducts({ facets, page: currentPage }),
+				1000,
+			);
 
 			for (const product of products) {
 				await this.validateProduct(product);
