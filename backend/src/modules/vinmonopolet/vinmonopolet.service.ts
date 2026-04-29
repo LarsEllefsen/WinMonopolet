@@ -20,15 +20,18 @@ import { Store } from '@modules/stores/entities/stores.entity';
 @Injectable()
 export class VinmonopoletService {
 	private readonly logger = new Logger(VinmonopoletService.name);
+	private readonly requestDelayMs = Number(
+		process.env.VINMONOPOLET_REQUEST_DELAY_MS ?? 1200,
+	);
 
-	async getAllProducts(facets: FacetValue[]) {
+	async getAllProducts(facets: FacetValue[], rateLimiting = true) {
 		const allProducts: VinmonopoletProduct[] = [];
 		let currentPage = 1;
 		let totalPages = 2;
 		while (currentPage <= totalPages) {
 			const { pagination, products } = await delayExecution(
 				() => getProducts({ facets, page: currentPage }),
-				1000,
+				rateLimiting ? this.requestDelayMs : 0,
 			);
 
 			for (const product of products) {
@@ -58,7 +61,7 @@ export class VinmonopoletService {
 						facet,
 						page: currentPage,
 					}),
-				rateLimiting ? 1000 : 0,
+				rateLimiting ? this.requestDelayMs : 0,
 			);
 			allProducts = allProducts.concat(
 				products.map(mapToVinmonopoletProductWithStockLevel),

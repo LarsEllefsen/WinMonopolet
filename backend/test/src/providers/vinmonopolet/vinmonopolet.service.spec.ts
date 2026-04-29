@@ -34,9 +34,10 @@ describe('vinmonopoletService', () => {
 			const mockGetAllProducts =
 				mocked(getProducts).mockResolvedValue(mockResponse);
 
-			const allProducts = await vinmonopoletService.getAllProducts([
-				Facet.Category.BEER,
-			]);
+			const allProducts = await vinmonopoletService.getAllProducts(
+				[Facet.Category.BEER],
+				false,
+			);
 
 			expect(allProducts).toHaveLength(10);
 			expect(mockGetAllProducts).toHaveBeenCalledTimes(10);
@@ -53,7 +54,7 @@ describe('vinmonopoletService', () => {
 			mocked(getProducts).mockResolvedValue(mockResponse);
 
 			expect(
-				vinmonopoletService.getAllProducts([Facet.Category.BEER]),
+				vinmonopoletService.getAllProducts([Facet.Category.BEER], false),
 			).rejects.toThrow(
 				'property code has failed the following constraints: isString, isNotEmpty',
 			);
