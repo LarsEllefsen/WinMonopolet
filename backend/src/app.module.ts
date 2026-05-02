@@ -20,7 +20,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 		ScheduleModule.forRoot(),
 		BullModule.forRoot({
 			redis: {
-				host: 'localhost',
+				host: process.env.REDIS_HOST ?? 'localhost',
 				port: 6379,
 			},
 		}),

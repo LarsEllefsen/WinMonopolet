@@ -10,7 +10,7 @@ const databaseProvider: Provider<Pool> = {
 		return new Pool({
 			user: process.env.DB_USER,
 			database: process.env.DB_NAME,
-			host: 'localhost',
+			host: process.env.DB_HOST ?? 'localhost',
 			port: Number(process.env.DB_PORT),
 			password: process.env.DB_PASSWORD,
 		});

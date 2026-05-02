@@ -2,7 +2,7 @@ node_modules
 dist
 test
 .gitignore
-# .env
+.env
 .prettierrc
 .jest.config.js
 README.md

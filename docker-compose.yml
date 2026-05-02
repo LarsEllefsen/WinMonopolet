@@ -1,0 +1,33 @@
+services:
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PORT=${DB_PORT}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=host.docker.internal
+      - REDIS_HOST=host.docker.internal
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - ACCESS_TOKEN_ENCRYPTION_KEY=${ACCESS_TOKEN_ENCRYPTION_KEY}
+      - ADMIN_USER_ID=${ADMIN_USER_ID}
+      - UNTAPPD_BASE_URL=${UNTAPPD_BASE_URL}
+      - UNTAPPD_CLIENT_ID=${UNTAPPD_CLIENT_ID}
+      - UNTAPPD_CLIENT_SECRET=${UNTAPPD_CLIENT_SECRET}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    build: ./frontend
+    restart: always
+    ports:
+      - "5000:8080"
+    environment:
+      - API_URL=http://backend:3000
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - backend
