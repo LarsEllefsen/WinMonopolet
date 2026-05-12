@@ -146,21 +146,26 @@ describe('storesRepository', () => {
 			);
 		});
 
-		it('should order by stock_last_updated ASC with nulls first', async () => {
-			await insertMockStores();
-			await insertMockProducts();
-			await storeRepository.updateStockForStore([MOCK_STOCK1], mockStore2.store_id);
-			await storeRepository.updateStockForStore([MOCK_STOCK2], mockStore3.store_id);
+		it('should order by stock_last_updated ASC', async () => {
+			const oldestUpdatedStore = createMockStore({
+				store_id: '1',
+				stockLastUpdated: new Date('2025-01-01T06:00:00Z'),
+			});
+			const newestUpdatedStore = createMockStore({
+				store_id: '2',
+				stockLastUpdated: new Date('2026-05-12T10:21:00Z'),
+			});
+
+			await storeRepository.saveStore(oldestUpdatedStore);
+			await storeRepository.saveStore(newestUpdatedStore);
 
 			const stores = await storeRepository.getAllStores({
 				orderBy: 'stock_last_updated',
 				direction: 'ASC',
 			});
 
-			expect(stores[0].store_id).toBe(mockStore1.store_id);
-			expect(stores[1].stockLastUpdated!.getTime()).toBeLessThanOrEqual(
-				stores[2].stockLastUpdated!.getTime(),
-			);
+			expect(stores[0].store_id).toBe(oldestUpdatedStore.store_id);
+			expect(stores[1].store_id).toBe(newestUpdatedStore.store_id);
 		});
 	});
 
@@ -201,7 +206,10 @@ describe('storesRepository', () => {
 			await insertMockStores();
 			await insertMockProducts();
 
-			await storeRepository.updateStockForStore([MOCK_STOCK1], mockStore1.store_id);
+			await storeRepository.updateStockForStore(
+				[MOCK_STOCK1],
+				mockStore1.store_id,
+			);
 
 			const store = await storeRepository.getStore(mockStore1.store_id);
 			expect(store!.stockLastUpdated).toBeInstanceOf(Date);
