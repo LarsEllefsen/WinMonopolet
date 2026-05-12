@@ -25,6 +25,7 @@ export const createMockStore = ({
 	lat = '63.4303344',
 	lon = '10.3932725',
 	zip = '7013',
+	stockLastUpdated = null as Date | null,
 }) => {
 	return new Store(
 		store_id,
@@ -35,6 +36,7 @@ export const createMockStore = ({
 		zip,
 		lon,
 		lat,
+		stockLastUpdated,
 	);
 };
 

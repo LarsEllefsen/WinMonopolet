@@ -9,6 +9,7 @@ export const mockStore1 = new Store(
 	'1234',
 	'42.48623',
 	'94.53157',
+	null,
 );
 
 export const mockStore2 = new Store(
@@ -20,6 +21,7 @@ export const mockStore2 = new Store(
 	'1234',
 	'42.48623',
 	'94.53157',
+	null,
 );
 
 export const mockStore3 = new Store(
@@ -31,6 +33,7 @@ export const mockStore3 = new Store(
 	'0987',
 	'42.48623',
 	'94.53157',
+	null,
 );
 
 export const mockStores = [mockStore1, mockStore2, mockStore3];

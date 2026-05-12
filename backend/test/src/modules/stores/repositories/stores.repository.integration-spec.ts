@@ -145,6 +145,23 @@ describe('storesRepository', () => {
 				mockStores[0],
 			);
 		});
+
+		it('should order by stock_last_updated ASC with nulls first', async () => {
+			await insertMockStores();
+			await insertMockProducts();
+			await storeRepository.updateStockForStore([MOCK_STOCK1], mockStore2.store_id);
+			await storeRepository.updateStockForStore([MOCK_STOCK2], mockStore3.store_id);
+
+			const stores = await storeRepository.getAllStores({
+				orderBy: 'stock_last_updated',
+				direction: 'ASC',
+			});
+
+			expect(stores[0].store_id).toBe(mockStore1.store_id);
+			expect(stores[1].stockLastUpdated!.getTime()).toBeLessThanOrEqual(
+				stores[2].stockLastUpdated!.getTime(),
+			);
+		});
 	});
 
 	describe('getStockForStore', () => {
@@ -180,6 +197,16 @@ describe('storesRepository', () => {
 	});
 
 	describe('updateStockForStore', () => {
+		it('should set stock_last_updated on the store', async () => {
+			await insertMockStores();
+			await insertMockProducts();
+
+			await storeRepository.updateStockForStore([MOCK_STOCK1], mockStore1.store_id);
+
+			const store = await storeRepository.getStore(mockStore1.store_id);
+			expect(store!.stockLastUpdated).toBeInstanceOf(Date);
+		});
+
 		it('Should insert any new stock and remove any old stock', async () => {
 			const expectedStock = [
 				new Stock(

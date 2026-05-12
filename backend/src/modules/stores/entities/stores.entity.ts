@@ -8,6 +8,7 @@ export class Store {
 		zip: string | undefined,
 		lon: string,
 		lat: string,
+		stockLastUpdated: Date | null,
 	) {
 		this.store_id = storeId;
 		this.name = name;
@@ -17,6 +18,7 @@ export class Store {
 		this.zip = zip;
 		this.lon = lon;
 		this.lat = lat;
+		this.stockLastUpdated = stockLastUpdated;
 	}
 
 	store_id: string;
@@ -34,4 +36,6 @@ export class Store {
 	lon: string;
 
 	lat: string;
+
+	stockLastUpdated: Date | null;
 }

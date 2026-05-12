@@ -53,7 +53,10 @@ export class StoresService {
 	}
 
 	async updateStockForAllStores() {
-		const stores = await this.getAllStores();
+		const stores = await this.storesRepository.getAllStores({
+			orderBy: 'stock_last_updated',
+			direction: 'ASC',
+		});
 		for (const store of stores) {
 			try {
 				await this.updateStockForStore(store);

@@ -19,6 +19,7 @@ export type StoresRow = {
 	zip?: string;
 	lon: string;
 	lat: string;
+	stock_last_updated: string | null;
 };
 
 export type StockRow = {
@@ -28,14 +29,22 @@ export type StockRow = {
 	last_updated: string;
 };
 
+type GetAllStoresOptions = {
+	orderBy: 'stock_last_updated';
+	direction: 'ASC' | 'DESC';
+};
+
 @Injectable()
 export class StoresRepository {
 	constructor(@Inject(CONNECTION_POOL) private connectionPool: Pool) {}
 
-	public async getAllStores() {
-		const stores = await this.connectionPool.query<StoresRow>(
-			'SELECT * FROM stores',
-		);
+	public async getAllStores(options?: GetAllStoresOptions) {
+		let query = 'SELECT * FROM stores';
+		if (options) {
+			query += this.createGetAllStoresOrderByClause(options);
+		}
+
+		const stores = await this.connectionPool.query<StoresRow>(query);
 
 		return stores.rows.map(this.mapToStore);
 	}
@@ -68,6 +77,10 @@ export class StoresRepository {
 					[storeId, vinmonopoletProduct.vmp_id, stockLevel],
 				);
 			}
+			await client.query(
+				`UPDATE stores SET stock_last_updated = now() WHERE store_id = $1`,
+				[storeId],
+			);
 			await client.query('COMMIT');
 		} catch (error) {
 			await client.query('ROLLBACK');
@@ -139,6 +152,7 @@ export class StoresRepository {
 			row.zip,
 			row.lon,
 			row.lat,
+			row.stock_last_updated != null ? new Date(row.stock_last_updated) : null,
 		);
 	}
 
@@ -151,5 +165,12 @@ export class StoresRepository {
 			row.stock_level,
 			new Date(row.last_updated),
 		);
+	}
+
+	private createGetAllStoresOrderByClause(options: GetAllStoresOptions) {
+		switch (options.orderBy) {
+			case 'stock_last_updated':
+				return ` ORDER BY stock_last_updated ${options.direction} NULLS FIRST`;
+		}
 	}
 }
