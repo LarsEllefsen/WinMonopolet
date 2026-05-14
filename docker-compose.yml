@@ -19,6 +19,7 @@ services:
       - UNTAPPD_CLIENT_ID=${UNTAPPD_CLIENT_ID}
       - UNTAPPD_CLIENT_SECRET=${UNTAPPD_CLIENT_SECRET}
       - VINMONOPOLET_REQUEST_DELAY_MS=2000
+      - VINMONOPOLET_BASE_URL=${VINMONOPOLET_BASE_URL}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
