@@ -17,7 +17,7 @@ Some functionality will not work locally. API calls to untappd and user authenti
 ### Prerequisites
 
 - A Postgres instance. A docker compose file is included for easy setup.
-- Node v16 or later
+- Node 20 or later
 
 ### Install
 
