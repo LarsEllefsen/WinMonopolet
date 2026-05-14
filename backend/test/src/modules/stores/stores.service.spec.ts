@@ -59,7 +59,7 @@ describe('storesService', () => {
 
 	describe('updateStockForAllStores', () => {
 		it('should correctly call updateStockForStore for each store in the database', async () => {
-			jest
+			const getAllStoresSpy = jest
 				.spyOn(storesRepository, 'getAllStores')
 				.mockResolvedValue([store1, store2, store3]);
 			const updateStockForStoreSpy = jest.spyOn(
@@ -69,6 +69,10 @@ describe('storesService', () => {
 
 			await storesService.updateStockForAllStores();
 
+			expect(getAllStoresSpy).toHaveBeenCalledWith({
+				orderBy: 'stock_last_updated',
+				direction: 'ASC',
+			});
 			expect(updateStockForStoreSpy).toHaveBeenCalledTimes(3);
 		});
 	});

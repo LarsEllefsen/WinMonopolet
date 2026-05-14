@@ -91,5 +91,6 @@ export const mapToStore = (storeDTO: BaseStore) => {
 		storeDTO.zip,
 		storeDTO.gpsCoordinates[1].toString(),
 		storeDTO.gpsCoordinates[0].toString(),
+		null,
 	);
 };
