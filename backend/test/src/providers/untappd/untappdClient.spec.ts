@@ -25,7 +25,7 @@ describe('UntappdClient', () => {
 	});
 
 	it('should return search results', async () => {
-		jest.spyOn(untappdNode, 'searchBeers').mockResolvedValue([
+		jest.spyOn(untappdClient.client, 'searchBeers').mockResolvedValue([
 			{
 				id: '1',
 				name: 'First Matched Beer',
@@ -47,7 +47,7 @@ describe('UntappdClient', () => {
 	});
 
 	it('should return search results with delay', async () => {
-		jest.spyOn(untappdNode, 'searchBeers').mockResolvedValue([
+		jest.spyOn(untappdClient.client, 'searchBeers').mockResolvedValue([
 			{
 				id: '1',
 				name: 'First Matched Beer',
@@ -82,7 +82,7 @@ describe('UntappdClient', () => {
 	])(
 		'Should catch any http errors and throw appropriate exception',
 		async (errorCode, expectedException) => {
-			jest.spyOn(untappdNode, 'searchBeers').mockImplementation(() => {
+			jest.spyOn(untappdClient.client, 'searchBeers').mockImplementation(() => {
 				throw new untappdNode.HTTPException(errorCode, 'Something went wrong');
 			});
 
@@ -97,7 +97,7 @@ describe('UntappdClient', () => {
 	);
 
 	it('should decrease remainingAPICalls by one for each api call', async () => {
-		jest.spyOn(untappdNode, 'searchBeers').mockResolvedValue([]);
+		jest.spyOn(untappdClient.client, 'searchBeers').mockResolvedValue([]);
 
 		expect(untappdClient.remainingAPICalls).toBe(100);
 
@@ -111,7 +111,7 @@ describe('UntappdClient', () => {
 	});
 
 	it('should throw APILimitReachedException when remainingAPICalls reaches zero', async () => {
-		jest.spyOn(untappdNode, 'searchBeers').mockImplementation(() => {
+		jest.spyOn(untappdClient.client, 'searchBeers').mockImplementation(() => {
 			throw new Error('Should not have been called');
 		});
 		untappdClient.remainingAPICalls = 0;

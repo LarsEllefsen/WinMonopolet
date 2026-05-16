@@ -11,19 +11,22 @@ import { ConfigService } from '@nestjs/config';
 import { APILimitReachedException } from '@exceptions/APILimitReachedException';
 import { TooManyRequestsException } from '@exceptions/TooManyRequestsException';
 import {
+	UntappdClient as _UntappdClient,
 	Beer,
-	getBeer,
 	HTTPException,
-	searchBeers,
 	SearchResult,
 } from 'untappd-node';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UntappdClient {
+	client: _UntappdClient;
 	remainingAPICalls: number;
 
-	constructor() {
+	constructor(private configService: ConfigService) {
+		this.client = new _UntappdClient({
+			baseUrl: configService.get('UNTAPPD_BASE_URL') ?? 'https://untappd.com',
+		});
 		this.remainingAPICalls = 100;
 	}
 
@@ -34,7 +37,7 @@ export class UntappdClient {
 		query: string,
 		delay = this.DELAY,
 	): Promise<{ remainingAPICalls: number; searchResult: SearchResult[] }> {
-		const searchResult = await this.GET(() => searchBeers(query));
+		const searchResult = await this.GET(() => this.client.searchBeers(query));
 		return new Promise((resolve) =>
 			setTimeout(
 				() =>
@@ -48,7 +51,7 @@ export class UntappdClient {
 		id: string,
 		delay = this.DELAY,
 	): Promise<{ remainingAPICalls: number; beer: Beer | null }> {
-		const beer = await this.GET(() => getBeer(id));
+		const beer = await this.GET(() => this.client.getBeer(id));
 		return new Promise((resolve) =>
 			setTimeout(
 				() => resolve({ remainingAPICalls: this.remainingAPICalls, beer }),
@@ -67,7 +70,7 @@ export class UntappdClient {
 			this.remainingAPICalls--;
 			return response;
 		} catch (error) {
-			this.exceptionMapper(error);
+			this.exceptionMapper(error as Error);
 		}
 	}
 

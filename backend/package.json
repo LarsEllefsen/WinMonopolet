@@ -46,7 +46,7 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
-    "untappd-node": "^1.1.0",
+    "untappd-node": "1.2.0",
     "uuid": "^9.0.1",
     "vinmonopolet-ts": "5.2.11"
   },

@@ -7155,10 +7155,10 @@ unpipe@1.0.0, unpipe@~1.0.0:
   resolved "https://registry.npmjs.org/unpipe/-/unpipe-1.0.0.tgz"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
 
-untappd-node@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/untappd-node/-/untappd-node-1.1.0.tgz#dc22c81eed043413973c88c1b2a43a331c059b46"
-  integrity sha512-5NAb5OBmuLnFLH9CaUgLUt5d+7OjNxSc/EYwvRSD0HCMhNEyl7LJk6bmG5mFeVeVGQ7ulhk/V0uUJoaq93Lt7w==
+untappd-node@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/untappd-node/-/untappd-node-1.2.0.tgz#867f30a3c48d87c5bf5888d83ede1434f91d9916"
+  integrity sha512-VtoOmOEcSFb+yg5pozVRbyV96jX+t5YSJTUvkuHAqu0jQ+yoHrQJKgfGRZxTKykEVkAYreZyZqkrJ4jskbemHQ==
   dependencies:
     jsdom "^24.1.1"
     puppeteer-real-browser "^1.4.2"
