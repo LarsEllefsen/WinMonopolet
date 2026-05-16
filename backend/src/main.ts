@@ -3,9 +3,9 @@ import { AppModule } from './app.module';
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-	const logLevels = ['log', 'warn', 'error'] satisfies LogLevel[];
+	const logLevels = ['log', 'warn', 'error', 'debug'] satisfies LogLevel[];
 	const debugLogging =
-		process.env.NODE_ENV === 'development'
+		process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug'
 			? (['debug'] satisfies LogLevel[])
 			: [];
 
