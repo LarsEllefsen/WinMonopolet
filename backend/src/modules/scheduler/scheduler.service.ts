@@ -25,11 +25,13 @@ export class SchedulerService {
 	@Cron(CronExpression.EVERY_6_HOURS)
 	private async updateRoutine() {
 		if (process.env.NODE_ENV === 'development') return;
+
 		this.logger.log('Starting update routine');
-		await this.productService.saveAllVinmonopoletProducts();
-		await this.storesService.updateAvailableStores();
-		await this.storesService.updateStockForAllStores();
-		await this.productService.updateOldestUntappdProducts();
+
+		await this.runCatching(() => this.productService.saveAllVinmonopoletProducts(), 'saveAllVinmonopoletProducts');
+		await this.runCatching(() => this.storesService.updateAvailableStores(), 'updateAvailableStores');
+		await this.runCatching(() => this.storesService.updateStockForAllStores(), 'updateStockForAllStores');
+		await this.runCatching(() => this.productService.updateOldestUntappdProducts(), 'updateOldestUntappdProducts');
 		await this.cache.reset();
 	}
 
@@ -52,5 +54,17 @@ export class SchedulerService {
 		this.logger.log('Starting scheduled task: findAndSaveAnyUpcomingProducts');
 		await this.productService.findAndSaveAnyUpcomingProducts();
 		await this.cache.reset();
+	}
+
+	private async runCatching<T>(fn: () => Promise<T>, name: string) {
+		try {
+			return await fn();
+		} catch (error) {
+			if (error instanceof Error) {
+				this.logger.error(`${name} failed: ${error.message}`, error.stack);
+				return;
+			}
+			this.logger.error(`${name} failed: ${error}`);
+		}
 	}
 }
