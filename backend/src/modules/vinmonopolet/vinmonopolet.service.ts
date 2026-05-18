@@ -6,6 +6,7 @@ import {
 	getAllStores,
 	getProducts,
 	getProductsByStore,
+	VinmonopoletError,
 } from 'vinmonopolet-ts';
 import { VinmonopoletProductWithStockLevel } from './vinmonopolet.interface';
 import {
@@ -29,9 +30,10 @@ export class VinmonopoletService {
 		let currentPage = 1;
 		let totalPages = 2;
 		while (currentPage <= totalPages) {
-			const { pagination, products } = await delayExecution(
+			const { pagination, products } = await this.callApi(
 				() => getProducts({ facets, page: currentPage }),
-				rateLimiting ? this.requestDelayMs : 0,
+				rateLimiting,
+				'getProducts',
 			);
 
 			for (const product of products) {
@@ -55,13 +57,14 @@ export class VinmonopoletService {
 		let currentPage = 1;
 		let totalPages = 2;
 		while (currentPage <= totalPages) {
-			const { pagination, products } = await delayExecution(
+			const { pagination, products } = await this.callApi(
 				() =>
 					getProductsByStore(storeId, {
 						facet,
 						page: currentPage,
 					}),
-				rateLimiting ? this.requestDelayMs : 0,
+				rateLimiting,
+				'getProductsByStore',
 			);
 			allProducts = allProducts.concat(
 				products.map(mapToVinmonopoletProductWithStockLevel),
@@ -75,11 +78,38 @@ export class VinmonopoletService {
 	}
 
 	async getAllStores() {
-		const stores = await getAllStores();
+		const stores = await this.callApi(() => getAllStores(), true, 'getAllStores');
 		return stores.map((store) => {
 			const mappedStore = mapToStore(store);
 			return this.validateStore(mappedStore);
 		});
+	}
+
+	private async callApi<T>(
+		fn: () => Promise<T>,
+		rateLimitingEnabled = true,
+		name = fn.name,
+	) {
+		try {
+			return await delayExecution<T>(
+				() => fn(),
+				rateLimitingEnabled ? this.requestDelayMs : 0,
+			);
+		} catch (error) {
+			if (error instanceof VinmonopoletError) {
+				this.logger.error(
+					`${name} failed with status ${error.status}: ${error.message}`,
+				);
+				throw error;
+			}
+			if (error instanceof Error) {
+				this.logger.error(`${name} failed: ${error.message}`);
+				throw error;
+			}
+
+			this.logger.error(`${name} failed: ${error}`);
+			throw error;
+		}
 	}
 
 	private async validateProduct(baseProduct: BaseProduct) {
