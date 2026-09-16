@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
 import { Stock } from './entities/stock.entity';
 import { Store } from './entities/stores.entity';
 import { StoresService } from './stores.service';
@@ -21,5 +21,11 @@ export class StoresController {
 		@Param('store_id') storeId: string,
 	): Promise<Stock[]> {
 		return this.storeService.getStockForStore(storeId);
+	}
+
+	@Post('/:store_id/update_stock')
+	async updateStoreInventory(@Param('store_id') storeId: string) {
+		const store = await this.storeService.getStore(storeId);
+		this.storeService.updateStockForStore(store);
 	}
 }
