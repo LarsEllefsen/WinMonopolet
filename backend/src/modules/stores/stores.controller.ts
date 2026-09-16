@@ -16,6 +16,11 @@ export class StoresController {
 		return this.storeService.getAllStores();
 	}
 
+	@Get('/:store_id')
+	async getStore(@Param('store_id') storeId: string): Promise<Store> {
+		return this.storeService.getStore(storeId);
+	}
+
 	@Get('/:store_id/products')
 	async getAllProductsByStore(
 		@Param('store_id') storeId: string,
@@ -24,7 +29,7 @@ export class StoresController {
 	}
 
 	@Post('/:store_id/update_stock')
-	async updateStoreInventory(@Param('store_id') storeId: string) {
+	async updateStoreStock(@Param('store_id') storeId: string) {
 		const store = await this.storeService.getStore(storeId);
 		this.storeService.updateStockForStore(store);
 	}
