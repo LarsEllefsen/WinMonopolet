@@ -23,15 +23,44 @@ export class SchedulerService {
 	 * 18:00 (UTC) - 19:00 Europe/Oslo
 	 */
 	@Cron(CronExpression.EVERY_6_HOURS)
-	private async updateRoutine() {
+	private async updateProductsRoutine() {
 		if (process.env.NODE_ENV === 'development') return;
 
 		this.logger.log('Starting update routine');
 
-		await this.runCatching(() => this.productService.saveAllVinmonopoletProducts(), 'saveAllVinmonopoletProducts');
-		await this.runCatching(() => this.storesService.updateAvailableStores(), 'updateAvailableStores');
-		await this.runCatching(() => this.storesService.updateStockForAllStores(), 'updateStockForAllStores');
-		await this.runCatching(() => this.productService.updateOldestUntappdProducts(), 'updateOldestUntappdProducts');
+		await this.runCatching(
+			() => this.productService.saveAllVinmonopoletProducts(),
+			'saveAllVinmonopoletProducts',
+		);
+		await this.runCatching(
+			() => this.productService.updateOldestUntappdProducts(),
+			'updateOldestUntappdProducts',
+		);
+		await this.cache.reset();
+	}
+
+	/**
+	 * Offset 3 hours from updateRoutine so the two jobs never hit
+	 * Will run at:
+	 * 03:00 (UTC) - 04:00 Europe/Oslo
+	 * 09:00 (UTC) - 10:00 Europe/Oslo
+	 * 15:00 (UTC) - 16:00 Europe/Oslo
+	 * 21:00 (UTC) - 22:00 Europe/Oslo
+	 */
+	@Cron('0 3,9,15,21 * * *')
+	private async updateStoresRoutine() {
+		if (process.env.NODE_ENV === 'development') return;
+
+		this.logger.log('Starting update stores routine');
+
+		await this.runCatching(
+			() => this.storesService.updateAvailableStores(),
+			'updateAvailableStores',
+		);
+		await this.runCatching(
+			() => this.storesService.updateStockForAllStores(),
+			'updateStockForAllStores',
+		);
 		await this.cache.reset();
 	}
 
