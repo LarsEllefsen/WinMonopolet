@@ -6,6 +6,8 @@
 	import { createFilters } from '$lib/utils/createFilters';
 	import { goto } from '$app/navigation';
 	import StockList from '$lib/components/stockList/StockList.svelte';
+	import { hadBeers } from '$lib/stores/hadBeers';
+	import { decorateStock } from '$lib/utils/decorateStock';
 
 	let numProductsToShow = 20;
 
@@ -21,6 +23,10 @@
 		productSubCategories.forEach((subCategory) =>
 			params.append('productSubCategory', subCategory.name)
 		);
+
+		if (filters.removeUserCheckedInProducts) {
+			params.append('hideCheckedIn', 'true');
+		}
 
 		return params;
 	};
@@ -38,7 +44,7 @@
 			price: undefined,
 			abv: undefined,
 			onlyShowNewArrivals: undefined,
-			removeUserCheckedInProducts: undefined,
+			removeUserCheckedInProduct: searchParams.get('hideCheckedIn') === 'true',
 			productCategories: [
 				{
 					name: ProductCategory.ØL,
@@ -65,8 +71,12 @@
 		return filters satisfies CreateFilters;
 	};
 
-	$: products = $page.data.stock ?? [];
-	$: productsToShow = products.slice(0, numProductsToShow);
+	$: products = decorateStock($page.data.stock ?? [], $hadBeers);
+	$: visibleProducts =
+		filters.removeUserCheckedInProducts === true
+			? products.filter(({ product }) => !product.has_had)
+			: products;
+	$: productsToShow = visibleProducts.slice(0, numProductsToShow);
 	$: filters = createFilters(getFiltersFromSearchParams($page.url.searchParams));
 </script>
 
@@ -81,7 +91,11 @@
 		/>
 
 		<div class="lg:col-span-6 md:col-span-10 md:col-start-2 col-span-full">
-			<StockList stock={productsToShow} bind:numProductsToShow maxLength={products.length} />
+			<StockList
+				stock={productsToShow}
+				bind:numProductsToShow
+				maxLength={visibleProducts.length}
+			/>
 		</div>
 	</div>
 </div>

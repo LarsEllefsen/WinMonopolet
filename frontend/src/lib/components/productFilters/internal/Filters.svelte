@@ -20,6 +20,8 @@
 	import Checkbox from '../../checkbox/Checkbox.svelte';
 	import Collapsible from '../../collapsible/Collapsible.svelte';
 	import { DEFAULT_ABV_RANGE, DEFAULT_PRICE_RANGE } from '../../../../constants';
+	import HadBeersImport from './HadBeersImport.svelte';
+	import { hadBeers } from '$lib/stores/hadBeers';
 
 	export let filters: Filters;
 	export let onChange: (asd: Filters) => void;
@@ -62,7 +64,7 @@
 				on:change={() => onChange(filters)}
 			/>
 		{/if}
-		{#if isLoggedIn && filters.removeUserCheckedInProducts !== undefined}
+		{#if (isLoggedIn || $hadBeers.size > 0) && filters.removeUserCheckedInProducts !== undefined}
 			<Checkbox
 				bind:checked={filters.removeUserCheckedInProducts}
 				label={'Skjul innsjekket'}
@@ -71,6 +73,8 @@
 			/>
 		{/if}
 	</div>
+
+	<HadBeersImport />
 
 	<div class="px-2 mb-4 flex flex-col gap-y-2">
 		<p class="mb-2 font-semibold">Varegruppe</p>

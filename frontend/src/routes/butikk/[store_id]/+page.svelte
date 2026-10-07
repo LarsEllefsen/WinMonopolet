@@ -4,6 +4,8 @@
 	import { createFiltersFromStock } from '$lib/utils/createFilters';
 	import { filterStock } from '$lib/utils/filterProducts';
 	import StockList from '$lib/components/stockList/StockList.svelte';
+	import { hadBeers } from '$lib/stores/hadBeers';
+	import { decorateStock } from '$lib/utils/decorateStock';
 	import type { Store } from '../../../types/store';
 
 	let numProductsToShow = 20;
@@ -11,9 +13,10 @@
 	$: currentStore = $page.data.stores.find(
 		(store: Store) => store.store_id === $page.params.store_id
 	) as Store;
-	$: filters = createFiltersFromStock($page.data.stock ?? []);
 	$: stock = $page.data.stock ?? [];
-	$: stockToShow = filterStock(stock ?? [], filters).slice(0, numProductsToShow);
+	$: decoratedStock = decorateStock(stock, $hadBeers);
+	$: filters = createFiltersFromStock(decoratedStock);
+	$: stockToShow = filterStock(decoratedStock, filters).slice(0, numProductsToShow);
 </script>
 
 <div class="container mx-auto relative">
